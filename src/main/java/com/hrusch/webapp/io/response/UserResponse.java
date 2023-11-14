@@ -1,10 +1,11 @@
 package com.hrusch.webapp.io.response;
 
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
-@Getter @Setter
-public class UserRest {
+@Getter
+@Builder
+public class UserResponse {
 
     private String userId;
 

@@ -2,11 +2,14 @@ package com.hrusch.webapp.io.controller;
 
 import com.hrusch.webapp.common.UserDto;
 import com.hrusch.webapp.io.request.UserRequest;
-import com.hrusch.webapp.io.response.UserRest;
+import com.hrusch.webapp.io.response.UserResponse;
 import com.hrusch.webapp.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
@@ -21,8 +24,14 @@ public class UserController {
         this.userService = userService;
     }
 
+    /**
+     * POST endpoint for creating a new user.
+     *
+     * @param userRequest the user to create
+     * @return a representation of the created user
+     */
     @PostMapping()
-    public UserRest createUser(@RequestBody @Valid UserRequest userRequest) {
+    public UserResponse createUser(@RequestBody @Valid UserRequest userRequest) {
         UserDto userToCreate = createUserDto(userRequest);
 
         UserDto createdUser = userService.createUser(userToCreate);
@@ -31,20 +40,18 @@ public class UserController {
     }
 
     public UserDto createUserDto(UserRequest userRequest) {
-        UserDto userDto = new UserDto();
-        userDto.setUserId(UUID.randomUUID().toString());
-        userDto.setUsername(userRequest.getUsername());
-        userDto.setPassword(userRequest.getPassword());
-        userDto.setEncryptedPassword("");
-
-        return userDto;
+        return UserDto.builder()
+                .userId(UUID.randomUUID().toString())
+                .username(userRequest.getUsername())
+                .password(userRequest.getPassword())
+                .encryptedPassword("")
+                .build();
     }
 
-    public UserRest createUserRest(UserDto userDto) {
-        UserRest userRest = new UserRest();
-        userRest.setUserId(userDto.getUserId());
-        userRest.setUsername(userDto.getUsername());
-
-        return userRest;
+    public UserResponse createUserRest(UserDto userDto) {
+        return UserResponse.builder()
+                .userId(userDto.getUserId())
+                .username(userDto.getUsername())
+                .build();
     }
 }

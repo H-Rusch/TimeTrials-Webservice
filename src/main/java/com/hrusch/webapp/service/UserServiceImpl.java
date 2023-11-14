@@ -32,14 +32,13 @@ public class UserServiceImpl implements UserService {
     }
 
     public UserEntity createUserEntity(UserDto userDto) {
-        UserEntity userEntity = new UserEntity();
-        userEntity.setUserId(UUID.randomUUID().toString());
-        userEntity.setUsername(userDto.getUsername());
+        var encryptedPassword = encryptPassword(userDto.getPassword());
 
-        String encryptedPassword = encryptPassword(userDto.getPassword());
-        userEntity.setEncryptedPassword(encryptedPassword);
-
-        return userEntity;
+        return UserEntity.builder()
+                .userId(userDto.getUserId())
+                .username(userDto.getUsername())
+                .encryptedPassword(encryptedPassword)
+                .build();
     }
 
     private String encryptPassword(String password) {
@@ -47,13 +46,12 @@ public class UserServiceImpl implements UserService {
     }
 
     public UserDto createUserDto(UserEntity entity) {
-        UserDto userDto = new UserDto();
-        userDto.setId(entity.getId());
-        userDto.setUserId(entity.getUserId());
-        userDto.setUsername(entity.getUsername());
-        userDto.setPassword("");
-        userDto.setEncryptedPassword(entity.getEncryptedPassword());
-
-        return userDto;
+        return UserDto.builder()
+                .id(entity.getId())
+                .userId(entity.getUserId())
+                .username(entity.getUsername())
+                .password("")
+                .encryptedPassword(entity.getEncryptedPassword())
+                .build();
     }
 }
