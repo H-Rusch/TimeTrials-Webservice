@@ -1,16 +1,19 @@
 package com.hrusch.webapp.service;
 
 import com.hrusch.webapp.common.UserDto;
+import com.hrusch.webapp.exception.UsernameAlreadyTakenException;
 import com.hrusch.webapp.repository.UserEntity;
 import com.hrusch.webapp.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @Service
 public class UserServiceImpl implements UserService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
@@ -22,11 +25,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto createUser(UserDto userDto) {
+    public UserDto createUser(UserDto userDto) throws UsernameAlreadyTakenException {
         UserEntity userEntity = createUserEntity(userDto);
 
+        var foundUser = userRepository.findByUsername(userEntity.getUsername());
+        if (foundUser.isPresent()) {
+            LOG.warn("Trying to create use with a name that has already been taken: {}", userEntity.getUsername());
+            throw new UsernameAlreadyTakenException(String.format("The username has already been taken: %s", userEntity.getUsername()));
+        }
+
         UserEntity createdUser = userRepository.save(userEntity);
-        System.out.println(createdUser);
+        LOG.info("Created user with user-id: {}", createdUser.getUserId());
 
         return createUserDto(createdUser);
     }
