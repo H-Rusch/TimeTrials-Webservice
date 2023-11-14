@@ -150,3 +150,7 @@ fabric.properties
 *.iml
 out
 gen
+
+# Maven executeable
+mvnw
+mvnw.cmd
