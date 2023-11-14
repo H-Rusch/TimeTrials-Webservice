@@ -44,6 +44,7 @@ public class UserServiceImpl implements UserService {
         var encryptedPassword = encryptPassword(userDto.getPassword());
 
         return UserEntity.builder()
+                .id(userDto.getId())
                 .userId(userDto.getUserId())
                 .username(userDto.getUsername())
                 .encryptedPassword(encryptedPassword)
