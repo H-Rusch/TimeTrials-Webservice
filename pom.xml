@@ -8,13 +8,13 @@
 		<version>3.1.4</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.example</groupId>
-	<artifactId>guides</artifactId>
+	<groupId>com.hrusch</groupId>
+	<artifactId>webapp</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Guide Web App</name>
-	<description>Guide web app using Spring Boot</description>
+	<name>Web App</name>
+	<description>Web app using Spring Boot</description>
 	<properties>
-		<java.version>17</java.version>
+		<java.version>21</java.version>
 	</properties>
 	<dependencies>
 		<dependency>
