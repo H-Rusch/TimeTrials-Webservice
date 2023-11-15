@@ -5,6 +5,7 @@ import com.hrusch.webapp.common.UserDto;
 import com.hrusch.webapp.exception.UsernameAlreadyTakenException;
 import com.hrusch.webapp.io.request.UserRequest;
 import com.hrusch.webapp.io.response.UserResponse;
+import com.hrusch.webapp.io.response.ValidationErrorResponse;
 import com.hrusch.webapp.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +26,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = UserController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class})
 class UserControllerWebLayerTest {
@@ -49,18 +49,13 @@ class UserControllerWebLayerTest {
     void createUser_whenValidUserDetailsProvided_returnsCreatedUserDetails() throws Exception {
         when(userService.createUser(any(UserDto.class)))
                 .thenReturn(createUserDtoFromRequestModel(requestModel));
-        RequestBuilder requestBuilder = MockMvcRequestBuilders.post(ENDPOINT)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(new ObjectMapper().writeValueAsString(requestModel));
+        RequestBuilder requestBuilder = buildRequest(requestModel);
 
-        MvcResult mvcResult = mockMvc.perform(requestBuilder)
-                .andExpect(status().isOk())
-                .andReturn();
-        String responseBodyString = mvcResult.getResponse().getContentAsString();
+        MvcResult mvcResult = mockMvc.perform(requestBuilder).andReturn();
         UserResponse createdUser = new ObjectMapper()
-                .readValue(responseBodyString, UserResponse.class);
+                .readValue(mvcResult.getResponse().getContentAsString(), UserResponse.class);
 
+        assertThat(mvcResult.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value());
         assertEquals(requestModel.getUsername(), createdUser.getUsername());
         assertNotNull(createdUser.getUserId());
         assertFalse(createdUser.getUserId().isEmpty());
@@ -71,14 +66,31 @@ class UserControllerWebLayerTest {
         UserDto dto = createUserDtoFromRequestModel(requestModel);
         when(userService.createUser(any(UserDto.class)))
                 .thenThrow(new UsernameAlreadyTakenException(dto.getUsername()));
-        RequestBuilder requestBuilder = MockMvcRequestBuilders.post(ENDPOINT)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(new ObjectMapper().writeValueAsString(requestModel));
+        RequestBuilder requestBuilder = buildRequest(requestModel);
 
         MvcResult mvcResult = mockMvc.perform(requestBuilder).andReturn();
 
         assertThat(mvcResult.getResponse().getStatus()).isEqualTo(HttpStatus.CONFLICT.value());
         assertThat(mvcResult.getResponse().getContentAsString()).startsWith("The username has already been taken");
+    }
+
+    @Test
+    void createUser_whenUserDetailsDoNotPassValidation_returnsErrorResponse() throws Exception {
+        requestModel.setPassword("a");
+        RequestBuilder requestBuilder = buildRequest(requestModel);
+
+        MvcResult mvcResult = mockMvc.perform(requestBuilder).andReturn();
+        ValidationErrorResponse response = new ObjectMapper()
+                .readValue(mvcResult.getResponse().getContentAsString(), ValidationErrorResponse.class);
+
+        assertThat(mvcResult.getResponse().getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getViolations()).hasSize(3);
+    }
+
+    private RequestBuilder buildRequest(UserRequest requestModel) throws Exception {
+        return MockMvcRequestBuilders.post(ENDPOINT)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(requestModel));
     }
 }
