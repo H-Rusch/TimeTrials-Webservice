@@ -10,6 +10,7 @@ public class PasswordFormatValidator implements ConstraintValidator<PasswordForm
         ConstraintValidator.super.initialize(constraintAnnotation);
     }
 
+    /** Password must contain a letter and a digit. */
     @Override
     public boolean isValid(String password, ConstraintValidatorContext cxt) {
         return password.matches(".*\\d+.*")

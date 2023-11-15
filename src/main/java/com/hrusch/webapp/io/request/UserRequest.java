@@ -13,7 +13,7 @@ import lombok.Setter;
 public class UserRequest {
 
     @NotNull
-    @Size(min = 2, max = 24, message = "{user.username.length}")
+    @Size(min = 3, max = 24, message = "{user.username.length}")
     private String username;
 
     @PasswordFormat
