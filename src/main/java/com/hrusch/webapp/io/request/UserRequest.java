@@ -1,13 +1,15 @@
 package com.hrusch.webapp.io.request;
 
-import com.hrusch.webapp.io.request.validation.PasswordFormat;
 import com.hrusch.webapp.io.request.validation.ConfirmField;
+import com.hrusch.webapp.io.request.validation.PasswordFormat;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
+import lombok.Setter;
 
 @ConfirmField(original = "password", confirmation = "repeatedPassword", message = "{equalPasswords.doNotMatch}")
 @Getter
+@Setter
 public class UserRequest {
 
     @NotNull

@@ -2,7 +2,9 @@ package com.hrusch.webapp.exception;
 
 public class UsernameAlreadyTakenException extends Exception {
 
-    public UsernameAlreadyTakenException(String message) {
-        super(message);
+    private static final String MESSAGE = "The username has already been taken: %s";
+
+    public UsernameAlreadyTakenException(String username) {
+        super(String.format(MESSAGE, username));
     }
 }

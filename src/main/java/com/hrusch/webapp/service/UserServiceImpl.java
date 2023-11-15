@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
         var foundUser = userRepository.findByUsername(userEntity.getUsername());
         if (foundUser.isPresent()) {
             LOG.warn("Trying to create use with a name that has already been taken: {}", userEntity.getUsername());
-            throw new UsernameAlreadyTakenException(String.format("The username has already been taken: %s", userEntity.getUsername()));
+            throw new UsernameAlreadyTakenException(userEntity.getUsername());
         }
 
         UserEntity createdUser = userRepository.save(userEntity);
