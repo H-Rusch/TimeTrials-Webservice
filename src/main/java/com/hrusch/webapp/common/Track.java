@@ -1,11 +1,19 @@
 package com.hrusch.webapp.common;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.hrusch.webapp.exception.TrackDeserializationException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 @AllArgsConstructor
 @Getter
-public enum Tracks {
+public enum Track {
     MARIO_KART_STADIUM("Mario Kart Stadium"),
     WATER_PARK("Water Park"),
     SWEET_SWEET_CANYON("Sweet Sweet Canyon"),
@@ -102,5 +110,26 @@ public enum Tracks {
     BOWER_CASTLE_3_SNES("[SNES] Bower Castle 3"),
     RAINBOW_ROAD_WII("[Wii] Rainbow Road");
 
+    @JsonValue
     private final String name;
+
+    private static final Map<String, Track> mapping;
+
+    static {
+        mapping = new HashMap<>();
+        Arrays.stream(Track.values()).forEach(track -> {
+            mapping.put(String.valueOf(track), track);
+            mapping.put(track.getName(), track);
+        });
+    }
+
+    @JsonCreator
+    public static Track forValue(String value) throws JsonProcessingException {
+        var track = mapping.get(value);
+        if (track == null) {
+            throw new TrackDeserializationException(String.format("Track can not be built from value: %s", value));
+        }
+
+        return track;
+    }
 }

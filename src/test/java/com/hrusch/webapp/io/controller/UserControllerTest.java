@@ -8,10 +8,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.UUID;
-
-import static com.hrusch.webapp.io.controller.UserUtil.createUserDtoFromRequestModel;
-import static com.hrusch.webapp.io.controller.UserUtil.createUserRequestModel;
+import static com.hrusch.webapp.UserUtil.createUserDtoFromRequestModel;
+import static com.hrusch.webapp.UserUtil.createUserRequestModel;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
