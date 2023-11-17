@@ -14,7 +14,7 @@ public class CustomDurationSerializer extends JsonSerializer<Duration> {
         long minutes = value.toMinutes();
         int seconds = value.toSecondsPart();
         int millis = value.toMillisPart();
-        String durationString = String.format("%d:%d.%d", minutes, seconds, millis);
+        String durationString = String.format("%01d:%02d.%03d", minutes, seconds, millis);
 
         gen.writeString(durationString);
     }

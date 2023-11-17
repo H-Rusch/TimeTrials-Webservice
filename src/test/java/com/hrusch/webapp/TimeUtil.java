@@ -12,7 +12,7 @@ import java.util.UUID;
 
 public class TimeUtil {
 
-    public static final Duration VALID_DURATION = Duration.parse("PT1M23.456S");
+    public static final Duration VALID_DURATION = Duration.parse("PT1M7.48S");
     private static final LocalDateTime TIMESTAMP = LocalDateTime.now();
 
     public static TimeRequest createTimeRequestModel() {

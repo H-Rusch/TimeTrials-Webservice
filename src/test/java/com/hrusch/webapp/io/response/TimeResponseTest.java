@@ -19,7 +19,7 @@ class TimeResponseTest {
 
         var serializedObject = mapper.writeValueAsString(response);
 
-        assertThat(serializedObject).isEqualTo("{\"username\":\"Testing123\",\"track\":\"[DS] Mario Circuit\",\"time\":\"1:23.456\",\"createdAt\":\"+1000000000-01-01@00:00:00\"}");
+        assertThat(serializedObject).isEqualTo("{\"username\":\"Testing123\",\"track\":\"[DS] Mario Circuit\",\"time\":\"1:07.480\",\"createdAt\":\"+1000000000-01-01@00:00:00\"}");
     }
 
     private TimeResponse createSampleTimeResponse() {
