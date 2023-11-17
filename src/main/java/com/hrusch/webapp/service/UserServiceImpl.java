@@ -1,6 +1,7 @@
 package com.hrusch.webapp.service;
 
 import com.hrusch.webapp.common.UserDto;
+import com.hrusch.webapp.exception.UserDoesNotExistException;
 import com.hrusch.webapp.exception.UsernameAlreadyTakenException;
 import com.hrusch.webapp.repository.UserEntity;
 import com.hrusch.webapp.repository.UserRepository;
@@ -37,7 +38,7 @@ public class UserServiceImpl implements UserService {
         UserEntity createdUser = userRepository.save(userEntity);
         LOG.info("Created user with user-id: {}", createdUser.getUserId());
 
-        return createUserDto(createdUser);
+        return UserDto.from(createdUser);
     }
 
     public UserEntity createUserEntity(UserDto userDto) {
@@ -55,13 +56,16 @@ public class UserServiceImpl implements UserService {
         return passwordEncoder.encode(password);
     }
 
-    public UserDto createUserDto(UserEntity entity) {
-        return UserDto.builder()
-                .id(entity.getId())
-                .userId(entity.getUserId())
-                .username(entity.getUsername())
-                .password("")
-                .encryptedPassword(entity.getEncryptedPassword())
-                .build();
+
+    @Override
+    public UserEntity findUserByUserId(String userId) throws UserDoesNotExistException {
+        var entity = userRepository.findByUserId(userId);
+
+        if (entity.isEmpty()) {
+            LOG.warn("Trying to find user with userId {} failed, since no user with this userId exists", userId);
+            throw new UserDoesNotExistException(userId);
+        }
+
+        return entity.get();
     }
 }

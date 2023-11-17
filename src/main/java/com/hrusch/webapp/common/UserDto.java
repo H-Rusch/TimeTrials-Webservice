@@ -1,7 +1,11 @@
 package com.hrusch.webapp.common;
 
+import com.hrusch.webapp.io.request.UserRequest;
+import com.hrusch.webapp.repository.UserEntity;
 import lombok.Builder;
 import lombok.Getter;
+
+import java.util.UUID;
 
 @Getter
 @Builder
@@ -17,4 +21,20 @@ public class UserDto {
 
     private String encryptedPassword;
 
+    public static UserDto from(UserRequest userRequest) {
+        return UserDto.builder()
+                .userId(UUID.randomUUID().toString())
+                .username(userRequest.getUsername())
+                .password(userRequest.getPassword())
+                .build();
+    }
+
+    public static UserDto from(UserEntity entity) {
+        return UserDto.builder()
+                .id(entity.getId())
+                .userId(entity.getUserId())
+                .username(entity.getUsername())
+                .encryptedPassword(entity.getEncryptedPassword())
+                .build();
+    }
 }

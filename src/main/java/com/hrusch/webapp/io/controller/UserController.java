@@ -11,8 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
-
 @RestController()
 @RequestMapping("/users")
 public class UserController {
@@ -32,7 +30,7 @@ public class UserController {
      */
     @PostMapping()
     public UserResponse createUser(@RequestBody @Valid UserRequest userRequest) throws UsernameAlreadyTakenException {
-        UserDto userToCreate = createUserDto(userRequest);
+        UserDto userToCreate = UserDto.from(userRequest);
 
         UserDto createdUser = userService.createUser(userToCreate);
 
@@ -46,14 +44,7 @@ public class UserController {
                 .body(e.getMessage());
     }
 
-    public UserDto createUserDto(UserRequest userRequest) {
-        return UserDto.builder()
-                .userId(UUID.randomUUID().toString())
-                .username(userRequest.getUsername())
-                .password(userRequest.getPassword())
-                .encryptedPassword("")
-                .build();
-    }
+
 
     public UserResponse createUserResponse(UserDto userDto) {
         return UserResponse.builder()

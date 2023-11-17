@@ -20,8 +20,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static com.hrusch.webapp.io.controller.UserUtil.createUserDtoFromRequestModel;
-import static com.hrusch.webapp.io.controller.UserUtil.createUserRequestModel;
+import static com.hrusch.webapp.UserUtil.createUserDtoFromRequestModel;
+import static com.hrusch.webapp.UserUtil.createUserRequestModel;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
