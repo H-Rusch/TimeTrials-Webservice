@@ -1,5 +1,6 @@
 package com.hrusch.webapp.repository;
 
+import com.hrusch.webapp.common.UserDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,4 +33,12 @@ public class UserEntity {
 
     @OneToMany(mappedBy = "user")
     private final Set<TimeEntity> times = new HashSet<>();
+
+    public static UserEntity from(UserDto userDto) {
+        return UserEntity.builder()
+                .userId(userDto.getUserId())
+                .username(userDto.getUsername())
+                .encryptedPassword(userDto.getEncryptedPassword())
+                .build();
+    }
 }

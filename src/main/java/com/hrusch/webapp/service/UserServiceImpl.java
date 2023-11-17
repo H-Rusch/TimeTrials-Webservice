@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService {
         UserEntity createdUser = userRepository.save(userEntity);
         LOG.info("Created user with user-id: {}", createdUser.getUserId());
 
-        return createUserDto(createdUser);
+        return UserDto.from(createdUser);
     }
 
     public UserEntity createUserEntity(UserDto userDto) {
@@ -56,15 +56,6 @@ public class UserServiceImpl implements UserService {
         return passwordEncoder.encode(password);
     }
 
-    public UserDto createUserDto(UserEntity entity) {
-        return UserDto.builder()
-                .id(entity.getId())
-                .userId(entity.getUserId())
-                .username(entity.getUsername())
-                .password("")
-                .encryptedPassword(entity.getEncryptedPassword())
-                .build();
-    }
 
     @Override
     public UserEntity findUserByUserId(String userId) throws UserDoesNotExistException {

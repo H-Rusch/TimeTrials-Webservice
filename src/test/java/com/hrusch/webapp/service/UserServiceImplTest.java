@@ -41,7 +41,7 @@ class UserServiceImplTest {
     void translatingUserEntityToUserDtoWorks() {
         UserEntity entity = createEntity(uuid);
 
-        UserDto dto = userService.createUserDto(entity);
+        UserDto dto = UserDto.from(entity);
 
         assertEquals(entity.getId(), dto.getId());
         assertEquals(entity.getUserId(), dto.getUserId());
