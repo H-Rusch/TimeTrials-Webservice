@@ -6,7 +6,6 @@ import com.hrusch.webapp.model.dto.TimeDto;
 import com.hrusch.webapp.model.Track;
 import com.hrusch.webapp.exception.UserDoesNotExistException;
 import com.hrusch.webapp.model.request.TimeRequest;
-import com.hrusch.webapp.model.response.TimeResponse;
 import com.hrusch.webapp.validation.ValidationErrorResponse;
 import com.hrusch.webapp.service.TimeService;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,12 +54,12 @@ class TimeControllerWebLayerTest {
         RequestBuilder requestBuilder = buildRequest(requestModel);
 
         MvcResult mvcResult = mockMvc.perform(requestBuilder)
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andReturn();
-        TimeResponse savedTime = new ObjectMapper()
-                .readValue(mvcResult.getResponse().getContentAsString(), TimeResponse.class);
+        TimeDto savedTime = new ObjectMapper()
+                .readValue(mvcResult.getResponse().getContentAsString(), TimeDto.class);
 
-        assertThat(mvcResult.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(mvcResult.getResponse().getStatus()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(savedTime.getTrack()).isEqualTo(Track.BABY_PARK_GCN);
         assertThat(savedTime.getTime()).isEqualTo(TimeUtil.VALID_DURATION);
         assertThat(savedTime.getUsername()).isNotEmpty();

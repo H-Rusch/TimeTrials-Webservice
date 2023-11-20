@@ -1,9 +1,8 @@
 package com.hrusch.webapp.controller;
 
-import com.hrusch.webapp.model.dto.TimeDto;
 import com.hrusch.webapp.exception.UserDoesNotExistException;
+import com.hrusch.webapp.model.dto.TimeDto;
 import com.hrusch.webapp.model.request.TimeRequest;
-import com.hrusch.webapp.model.response.TimeResponse;
 import com.hrusch.webapp.service.TimeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,12 +30,14 @@ public class TimeController {
      * @return a representation of the created time record
      */
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public TimeResponse saveTime(@RequestBody @Valid TimeRequest timeRequest) throws UserDoesNotExistException {
+    public ResponseEntity<TimeDto> saveTime(@RequestBody @Valid TimeRequest timeRequest) throws UserDoesNotExistException {
         TimeDto timeDto = TimeDto.from(timeRequest);
 
         TimeDto createdTime = timeService.saveTime(timeDto);
 
-        return TimeResponse.from(createdTime);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(createdTime);
     }
 
     @ExceptionHandler(UserDoesNotExistException.class)
