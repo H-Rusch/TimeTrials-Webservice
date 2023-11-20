@@ -1,7 +1,7 @@
 package com.hrusch.webapp.model.request;
 
-import com.hrusch.webapp.model.request.validation.ConfirmField;
-import com.hrusch.webapp.model.request.validation.PasswordFormat;
+import com.hrusch.webapp.validation.ConfirmField;
+import com.hrusch.webapp.validation.PasswordFormat;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;

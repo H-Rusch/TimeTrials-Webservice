@@ -7,7 +7,7 @@ import com.hrusch.webapp.model.Track;
 import com.hrusch.webapp.exception.UserDoesNotExistException;
 import com.hrusch.webapp.model.request.TimeRequest;
 import com.hrusch.webapp.model.response.TimeResponse;
-import com.hrusch.webapp.model.response.ValidationErrorResponse;
+import com.hrusch.webapp.validation.ValidationErrorResponse;
 import com.hrusch.webapp.service.TimeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

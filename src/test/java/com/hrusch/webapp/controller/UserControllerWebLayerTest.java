@@ -4,8 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hrusch.webapp.model.dto.UserDto;
 import com.hrusch.webapp.exception.UsernameAlreadyTakenException;
 import com.hrusch.webapp.model.request.UserRequest;
-import com.hrusch.webapp.model.response.UserResponse;
-import com.hrusch.webapp.model.response.ValidationErrorResponse;
+import com.hrusch.webapp.validation.ValidationErrorResponse;
 import com.hrusch.webapp.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,10 +51,10 @@ class UserControllerWebLayerTest {
         RequestBuilder requestBuilder = buildRequest(requestModel);
 
         MvcResult mvcResult = mockMvc.perform(requestBuilder).andReturn();
-        UserResponse createdUser = new ObjectMapper()
-                .readValue(mvcResult.getResponse().getContentAsString(), UserResponse.class);
+        UserDto createdUser = new ObjectMapper()
+                .readValue(mvcResult.getResponse().getContentAsString(), UserDto.class);
 
-        assertThat(mvcResult.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(mvcResult.getResponse().getStatus()).isEqualTo(HttpStatus.CREATED.value());
         assertEquals(requestModel.getUsername(), createdUser.getUsername());
         assertNotNull(createdUser.getUserId());
         assertFalse(createdUser.getUserId().isEmpty());

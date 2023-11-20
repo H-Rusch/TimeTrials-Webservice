@@ -1,9 +1,8 @@
 package com.hrusch.webapp.controller;
 
-import com.hrusch.webapp.model.dto.UserDto;
 import com.hrusch.webapp.exception.UsernameAlreadyTakenException;
+import com.hrusch.webapp.model.dto.UserDto;
 import com.hrusch.webapp.model.request.UserRequest;
-import com.hrusch.webapp.model.response.UserResponse;
 import com.hrusch.webapp.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +28,14 @@ public class UserController {
      * @return a representation of the created user
      */
     @PostMapping()
-    public UserResponse createUser(@RequestBody @Valid UserRequest userRequest) throws UsernameAlreadyTakenException {
+    public ResponseEntity<UserDto> createUser(@RequestBody @Valid UserRequest userRequest) throws UsernameAlreadyTakenException {
         UserDto userToCreate = UserDto.from(userRequest);
 
         UserDto createdUser = userService.createUser(userToCreate);
 
-        return createUserResponse(createdUser);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(createdUser);
     }
 
     @ExceptionHandler(UsernameAlreadyTakenException.class)
@@ -42,14 +43,5 @@ public class UserController {
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
                 .body(e.getMessage());
-    }
-
-
-
-    public UserResponse createUserResponse(UserDto userDto) {
-        return UserResponse.builder()
-                .userId(userDto.getUserId())
-                .username(userDto.getUsername())
-                .build();
     }
 }
