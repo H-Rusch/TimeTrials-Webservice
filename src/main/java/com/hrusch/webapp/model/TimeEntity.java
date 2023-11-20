@@ -1,9 +1,10 @@
 package com.hrusch.webapp.model;
 
-import com.hrusch.webapp.model.dto.TimeDto;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -12,6 +13,8 @@ import java.time.LocalDateTime;
 @Table(name = "times")
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class TimeEntity {
 
     @Id
@@ -30,13 +33,4 @@ public class TimeEntity {
     @ManyToOne
     @JoinColumn(name = "user.id")
     private UserEntity user;
-
-    public static TimeEntity from(TimeDto timeDto, UserEntity user) {
-        return TimeEntity.builder()
-                .track(timeDto.getTrack())
-                .time(timeDto.getTime())
-                .createdAt(timeDto.getCreatedAt())
-                .user(user)
-                .build();
-    }
 }

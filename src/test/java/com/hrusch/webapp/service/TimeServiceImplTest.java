@@ -2,12 +2,14 @@ package com.hrusch.webapp.service;
 
 import com.hrusch.webapp.exception.UserDoesNotExistException;
 import com.hrusch.webapp.model.TimeEntity;
+import com.hrusch.webapp.model.dto.TimeDto;
 import com.hrusch.webapp.repository.TimeRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
 
 import java.util.UUID;
 
@@ -17,6 +19,7 @@ import static com.hrusch.webapp.UserUtil.createEntity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -28,15 +31,22 @@ class TimeServiceImplTest {
     TimeRepository timeRepository;
     @Mock
     UserService userService;
+    @Mock
+    ModelMapper modelMapper;
 
     @InjectMocks
     TimeServiceImpl timeService;
 
     @Test
     void saveTime_whenGivenValidTimeRequestAndUserPresent_createAndReturnTimeObject() throws Exception {
-        var user = createEntity(userId);
-        when(userService.findUserByUserId(any(String.class))).thenReturn(user);
-        when(timeRepository.save(any(TimeEntity.class))).thenReturn(createTimeEntity(user));
+        var userEntity = createEntity(userId);
+        var timeEntity = createTimeEntity(userEntity);
+        when(modelMapper.map(any(TimeDto.class), eq(TimeEntity.class)))
+                .thenReturn(timeEntity);
+        when(userService.findUserByUserId(any(String.class))).thenReturn(userEntity);
+        when(timeRepository.save(any(TimeEntity.class))).thenReturn(timeEntity);
+        when(modelMapper.map(any(TimeEntity.class), eq(TimeDto.class)))
+                .thenReturn(new ModelMapper().map(timeEntity, TimeDto.class));
         var timeDto = createTimeDto(userId);
 
         var resultingTimeDto = timeService.saveTime(timeDto);
@@ -56,5 +66,4 @@ class TimeServiceImplTest {
         var exception = assertThrows(UserDoesNotExistException.class, () -> timeService.saveTime(timeDto));
         assertThat(exception.getMessage()).isEqualTo("User with the userId %s does not exist.", userId.toString());
     }
-
 }

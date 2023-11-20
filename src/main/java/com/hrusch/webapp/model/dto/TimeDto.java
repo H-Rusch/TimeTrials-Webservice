@@ -44,24 +44,4 @@ public class TimeDto {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss")
     private LocalDateTime createdAt;
-
-    public static TimeDto from(TimeRequest request) {
-        return TimeDto.builder()
-                .userId(request.getUserId())
-                .track(request.getTrack())
-                .time(request.getTime())
-                .createdAt(LocalDateTime.now())
-                .build();
-    }
-
-    public static TimeDto from(TimeEntity entity) {
-        return TimeDto.builder()
-                .id(entity.getId())
-                .userId(entity.getUser().getUserId())
-                .username(entity.getUser().getUsername())
-                .track(entity.getTrack())
-                .createdAt(entity.getCreatedAt())
-                .time(entity.getTime())
-                .build();
-    }
 }

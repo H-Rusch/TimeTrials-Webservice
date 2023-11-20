@@ -2,14 +2,15 @@ package com.hrusch.webapp.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hrusch.webapp.TimeUtil;
-import com.hrusch.webapp.model.dto.TimeDto;
-import com.hrusch.webapp.model.Track;
 import com.hrusch.webapp.exception.UserDoesNotExistException;
+import com.hrusch.webapp.model.Track;
+import com.hrusch.webapp.model.dto.TimeDto;
 import com.hrusch.webapp.model.request.TimeRequest;
-import com.hrusch.webapp.validation.ValidationErrorResponse;
 import com.hrusch.webapp.service.TimeService;
+import com.hrusch.webapp.validation.ValidationErrorResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -21,9 +22,11 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import static com.hrusch.webapp.TimeUtil.createTimeDtoFromRequestModel;
 import static com.hrusch.webapp.TimeUtil.createTimeRequestModel;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -34,6 +37,8 @@ class TimeControllerWebLayerTest {
 
     @MockBean
     TimeService timeService;
+    @MockBean
+    ModelMapper modelMapper;
 
     @Autowired
     private MockMvc mockMvc;
@@ -43,11 +48,14 @@ class TimeControllerWebLayerTest {
     @BeforeEach
     void setUp() {
         requestModel = createTimeRequestModel();
+        var returnedDto = createTimeDtoFromRequestModel(requestModel);
+        when(modelMapper.map(any(TimeRequest.class), eq(TimeDto.class)))
+                .thenReturn(returnedDto);
     }
 
     @Test
     void saveTime_whenValidTimeRequestProvided_returnSavedTimeDetails() throws Exception {
-        var returnedDto = TimeDto.from(requestModel);
+        var returnedDto = createTimeDtoFromRequestModel(requestModel);
         returnedDto.setUsername("Testing 123");
         when(timeService.saveTime(any(TimeDto.class)))
                 .thenReturn(returnedDto);
