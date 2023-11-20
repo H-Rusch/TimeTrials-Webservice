@@ -5,10 +5,13 @@ import com.hrusch.webapp.model.dto.UserDto;
 import com.hrusch.webapp.model.request.UserRequest;
 import com.hrusch.webapp.service.UserService;
 import jakarta.validation.Valid;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController()
 @RequestMapping("/users")
@@ -16,9 +19,12 @@ public class UserController {
 
     private final UserService userService;
 
+    private final ModelMapper modelMapper;
+
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, ModelMapper modelMapper) {
         this.userService = userService;
+        this.modelMapper = modelMapper;
     }
 
     /**
@@ -29,7 +35,7 @@ public class UserController {
      */
     @PostMapping()
     public ResponseEntity<UserDto> createUser(@RequestBody @Valid UserRequest userRequest) throws UsernameAlreadyTakenException {
-        UserDto userToCreate = UserDto.from(userRequest);
+        UserDto userToCreate = convertToDto(userRequest);
 
         UserDto createdUser = userService.createUser(userToCreate);
 
@@ -43,5 +49,12 @@ public class UserController {
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
                 .body(e.getMessage());
+    }
+
+    UserDto convertToDto(UserRequest userRequest) {
+        UserDto userDto = modelMapper.map(userRequest, UserDto.class);
+        userDto.setUserId(UUID.randomUUID().toString());
+
+        return userDto;
     }
 }

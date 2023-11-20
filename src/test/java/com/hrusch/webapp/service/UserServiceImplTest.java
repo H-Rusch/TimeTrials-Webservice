@@ -1,15 +1,18 @@
 package com.hrusch.webapp.service;
 
-import com.hrusch.webapp.model.dto.UserDto;
 import com.hrusch.webapp.exception.UserDoesNotExistException;
 import com.hrusch.webapp.exception.UsernameAlreadyTakenException;
 import com.hrusch.webapp.model.UserEntity;
+import com.hrusch.webapp.model.dto.UserDto;
 import com.hrusch.webapp.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Optional;
@@ -33,15 +36,22 @@ class UserServiceImplTest {
     UserRepository userRepository;
     @Mock
     BCryptPasswordEncoder encoder;
+    @Spy
+    ModelMapper modelMapper;
 
     @InjectMocks
     UserServiceImpl userService;
 
+    @BeforeEach
+    void setUp() {
+        modelMapper = new ModelMapper();
+    }
+
     @Test
-    void translatingUserEntityToUserDtoWorks() {
+    void convertToUserDto_whenGivenEntity_convertToToCorrectDto() {
         UserEntity entity = createEntity(uuid);
 
-        UserDto dto = UserDto.from(entity);
+        UserDto dto = userService.convertToUserDto(entity);
 
         assertEquals(entity.getId(), dto.getId());
         assertEquals(entity.getUserId(), dto.getUserId());
@@ -50,12 +60,12 @@ class UserServiceImplTest {
     }
 
     @Test
-    void translatingUserDtoToUserEntityWorks() {
+    void convertToUserEntity_whenGivenDto_convertToToCorrectEntity() {
+        UserDto dto = createDto(uuid);
         String encryptedPassword = "encrypted_password_123";
         when(encoder.encode(anyString())).thenReturn(encryptedPassword);
-        UserDto dto = createDto(uuid);
 
-        UserEntity entity = userService.createUserEntity(dto);
+        UserEntity entity = userService.convertToUserEntity(dto);
 
         assertEquals(dto.getId(), entity.getId());
         assertEquals(dto.getUserId(), entity.getUserId());

@@ -1,10 +1,11 @@
 package com.hrusch.webapp.service;
 
-import com.hrusch.webapp.model.dto.UserDto;
 import com.hrusch.webapp.exception.UserDoesNotExistException;
 import com.hrusch.webapp.exception.UsernameAlreadyTakenException;
 import com.hrusch.webapp.model.UserEntity;
+import com.hrusch.webapp.model.dto.UserDto;
 import com.hrusch.webapp.repository.UserRepository;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,16 +19,18 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final ModelMapper modelMapper;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, ModelMapper modelMapper) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.modelMapper = modelMapper;
     }
 
     @Override
     public UserDto createUser(UserDto userDto) throws UsernameAlreadyTakenException {
-        UserEntity userEntity = createUserEntity(userDto);
+        UserEntity userEntity = convertToUserEntity(userDto);
 
         var foundUser = userRepository.findByUsername(userEntity.getUsername());
         if (foundUser.isPresent()) {
@@ -38,24 +41,8 @@ public class UserServiceImpl implements UserService {
         UserEntity createdUser = userRepository.save(userEntity);
         LOG.info("Created user with user-id: {}", createdUser.getUserId());
 
-        return UserDto.from(createdUser);
+        return convertToUserDto(createdUser);
     }
-
-    public UserEntity createUserEntity(UserDto userDto) {
-        var encryptedPassword = encryptPassword(userDto.getPassword());
-
-        return UserEntity.builder()
-                .id(userDto.getId())
-                .userId(userDto.getUserId())
-                .username(userDto.getUsername())
-                .encryptedPassword(encryptedPassword)
-                .build();
-    }
-
-    private String encryptPassword(String password) {
-        return passwordEncoder.encode(password);
-    }
-
 
     @Override
     public UserEntity findUserByUserId(String userId) throws UserDoesNotExistException {
@@ -67,5 +54,21 @@ public class UserServiceImpl implements UserService {
         }
 
         return entity.get();
+    }
+
+    private String encryptPassword(String password) {
+        return passwordEncoder.encode(password);
+    }
+
+    UserEntity convertToUserEntity(UserDto userDto) {
+        var encryptedPassword = encryptPassword(userDto.getPassword());
+        UserEntity userEntity = modelMapper.map(userDto, UserEntity.class);
+        userEntity.setEncryptedPassword(encryptedPassword);
+
+        return userEntity;
+    }
+
+    UserDto convertToUserDto(UserEntity userEntity) {
+        return modelMapper.map(userEntity, UserDto.class);
     }
 }

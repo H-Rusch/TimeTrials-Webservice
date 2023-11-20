@@ -1,12 +1,15 @@
 package com.hrusch.webapp;
 
+import com.hrusch.webapp.model.UserEntity;
 import com.hrusch.webapp.model.dto.UserDto;
 import com.hrusch.webapp.model.request.UserRequest;
-import com.hrusch.webapp.model.UserEntity;
+import org.modelmapper.ModelMapper;
 
 import java.util.UUID;
 
 public class UserUtil {
+
+    private static final ModelMapper modelMapper = new ModelMapper();
 
     public static UserRequest createUserRequestModel() {
         UserRequest requestModel = new UserRequest();
@@ -18,12 +21,11 @@ public class UserUtil {
     }
 
     public static UserDto createUserDtoFromRequestModel(UserRequest requestModel) {
-        return UserDto.builder()
-                .id(1L)
-                .userId(UUID.randomUUID().toString())
-                .username(requestModel.getUsername())
-                .password(requestModel.getPassword())
-                .build();
+        UserDto userDto = modelMapper.map(requestModel, UserDto.class);
+        userDto.setId(1L);
+        userDto.setUserId(UUID.randomUUID().toString());
+
+        return userDto;
     }
 
     public static UserEntity createEntity(UUID uuid) {

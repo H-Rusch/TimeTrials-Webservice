@@ -1,10 +1,9 @@
 package com.hrusch.webapp.model;
 
-import com.hrusch.webapp.model.dto.UserDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
@@ -12,10 +11,10 @@ import java.util.Set;
 
 @Entity
 @Table(name = "users")
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
+@Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserEntity {
 
     @Id
@@ -33,12 +32,4 @@ public class UserEntity {
 
     @OneToMany(mappedBy = "user")
     private final Set<TimeEntity> times = new HashSet<>();
-
-    public static UserEntity from(UserDto userDto) {
-        return UserEntity.builder()
-                .userId(userDto.getUserId())
-                .username(userDto.getUsername())
-                .encryptedPassword(userDto.getEncryptedPassword())
-                .build();
-    }
 }

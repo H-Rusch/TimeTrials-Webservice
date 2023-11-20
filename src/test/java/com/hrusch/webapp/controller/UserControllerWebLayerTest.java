@@ -1,13 +1,14 @@
 package com.hrusch.webapp.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hrusch.webapp.model.dto.UserDto;
 import com.hrusch.webapp.exception.UsernameAlreadyTakenException;
+import com.hrusch.webapp.model.dto.UserDto;
 import com.hrusch.webapp.model.request.UserRequest;
-import com.hrusch.webapp.validation.ValidationErrorResponse;
 import com.hrusch.webapp.service.UserService;
+import com.hrusch.webapp.validation.ValidationErrorResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -33,6 +34,8 @@ class UserControllerWebLayerTest {
 
     @MockBean
     UserService userService;
+    @MockBean
+    ModelMapper modelMapper;
 
     @Autowired
     private MockMvc mockMvc;
@@ -42,6 +45,8 @@ class UserControllerWebLayerTest {
     @BeforeEach
     void setUp() {
         requestModel = createUserRequestModel();
+        when(modelMapper.map(any(), any()))
+                .thenReturn(createUserDtoFromRequestModel(requestModel));
     }
 
     @Test
