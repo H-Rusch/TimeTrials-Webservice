@@ -6,16 +6,13 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import com.hrusch.webapp.model.TimeEntity;
 import com.hrusch.webapp.model.Track;
-import com.hrusch.webapp.model.request.TimeRequest;
 import com.hrusch.webapp.model.serialization.CustomDurationDeserializer;
 import com.hrusch.webapp.model.serialization.CustomDurationSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -26,7 +23,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class TimeDto {
 
-    @Id
+    @JsonIgnore
     private Long id;
 
     @JsonIgnore

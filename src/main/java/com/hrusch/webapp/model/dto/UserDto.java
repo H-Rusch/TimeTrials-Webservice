@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
 
 @Data
 @Builder
@@ -13,7 +12,7 @@ import org.springframework.data.annotation.Id;
 @AllArgsConstructor
 public class UserDto {
 
-    @Id
+    @JsonIgnore
     private Long id;
     private String userId;
     private String username;
