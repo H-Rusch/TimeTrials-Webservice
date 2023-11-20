@@ -1,4 +1,4 @@
-package com.hrusch.webapp.exception;
+package com.hrusch.webapp.model.request.validation;
 
 import com.hrusch.webapp.model.response.ValidationError;
 import com.hrusch.webapp.model.response.ValidationErrorResponse;
