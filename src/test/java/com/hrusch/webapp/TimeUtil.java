@@ -1,10 +1,10 @@
 package com.hrusch.webapp;
 
-import com.hrusch.webapp.model.TimeDto;
+import com.hrusch.webapp.model.dto.TimeDto;
 import com.hrusch.webapp.model.Track;
 import com.hrusch.webapp.model.request.TimeRequest;
-import com.hrusch.webapp.repository.TimeEntity;
-import com.hrusch.webapp.repository.UserEntity;
+import com.hrusch.webapp.model.TimeEntity;
+import com.hrusch.webapp.model.UserEntity;
 
 import java.time.Duration;
 import java.time.LocalDateTime;

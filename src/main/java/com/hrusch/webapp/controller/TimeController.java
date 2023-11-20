@@ -1,6 +1,6 @@
 package com.hrusch.webapp.controller;
 
-import com.hrusch.webapp.model.TimeDto;
+import com.hrusch.webapp.model.dto.TimeDto;
 import com.hrusch.webapp.exception.UserDoesNotExistException;
 import com.hrusch.webapp.model.request.TimeRequest;
 import com.hrusch.webapp.model.response.TimeResponse;

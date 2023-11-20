@@ -1,6 +1,7 @@
 package com.hrusch.webapp.repository;
 
 import com.hrusch.webapp.UserUtil;
+import com.hrusch.webapp.model.UserEntity;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;

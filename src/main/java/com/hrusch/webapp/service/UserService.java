@@ -1,9 +1,9 @@
 package com.hrusch.webapp.service;
 
-import com.hrusch.webapp.model.UserDto;
+import com.hrusch.webapp.model.dto.UserDto;
 import com.hrusch.webapp.exception.UserDoesNotExistException;
 import com.hrusch.webapp.exception.UsernameAlreadyTakenException;
-import com.hrusch.webapp.repository.UserEntity;
+import com.hrusch.webapp.model.UserEntity;
 
 public interface UserService {
 

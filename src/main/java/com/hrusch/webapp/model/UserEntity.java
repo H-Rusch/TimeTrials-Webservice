@@ -1,6 +1,6 @@
-package com.hrusch.webapp.repository;
+package com.hrusch.webapp.model;
 
-import com.hrusch.webapp.model.UserDto;
+import com.hrusch.webapp.model.dto.UserDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

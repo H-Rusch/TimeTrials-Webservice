@@ -2,6 +2,7 @@ package com.hrusch.webapp.repository;
 
 import com.hrusch.webapp.TimeUtil;
 import com.hrusch.webapp.UserUtil;
+import com.hrusch.webapp.model.TimeEntity;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;

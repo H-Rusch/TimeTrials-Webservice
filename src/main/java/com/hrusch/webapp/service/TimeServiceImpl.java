@@ -1,10 +1,10 @@
 package com.hrusch.webapp.service;
 
-import com.hrusch.webapp.model.TimeDto;
+import com.hrusch.webapp.model.dto.TimeDto;
 import com.hrusch.webapp.exception.UserDoesNotExistException;
-import com.hrusch.webapp.repository.TimeEntity;
+import com.hrusch.webapp.model.TimeEntity;
 import com.hrusch.webapp.repository.TimeRepository;
-import com.hrusch.webapp.repository.UserEntity;
+import com.hrusch.webapp.model.UserEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

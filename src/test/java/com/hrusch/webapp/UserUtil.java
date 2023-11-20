@@ -1,8 +1,8 @@
 package com.hrusch.webapp;
 
-import com.hrusch.webapp.model.UserDto;
+import com.hrusch.webapp.model.dto.UserDto;
 import com.hrusch.webapp.model.request.UserRequest;
-import com.hrusch.webapp.repository.UserEntity;
+import com.hrusch.webapp.model.UserEntity;
 
 import java.util.UUID;
 

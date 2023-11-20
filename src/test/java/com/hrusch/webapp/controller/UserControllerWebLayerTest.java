@@ -1,7 +1,7 @@
 package com.hrusch.webapp.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hrusch.webapp.model.UserDto;
+import com.hrusch.webapp.model.dto.UserDto;
 import com.hrusch.webapp.exception.UsernameAlreadyTakenException;
 import com.hrusch.webapp.model.request.UserRequest;
 import com.hrusch.webapp.model.response.UserResponse;

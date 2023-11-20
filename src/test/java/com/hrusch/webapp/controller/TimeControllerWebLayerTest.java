@@ -2,7 +2,7 @@ package com.hrusch.webapp.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hrusch.webapp.TimeUtil;
-import com.hrusch.webapp.model.TimeDto;
+import com.hrusch.webapp.model.dto.TimeDto;
 import com.hrusch.webapp.model.Track;
 import com.hrusch.webapp.exception.UserDoesNotExistException;
 import com.hrusch.webapp.model.request.TimeRequest;

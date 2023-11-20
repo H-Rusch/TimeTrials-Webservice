@@ -1,7 +1,8 @@
-package com.hrusch.webapp.model;
+package com.hrusch.webapp.model.dto;
 
+import com.hrusch.webapp.model.Track;
 import com.hrusch.webapp.model.request.TimeRequest;
-import com.hrusch.webapp.repository.TimeEntity;
+import com.hrusch.webapp.model.TimeEntity;
 import lombok.Builder;
 import lombok.Data;
 

@@ -1,7 +1,6 @@
-package com.hrusch.webapp.repository;
+package com.hrusch.webapp.model;
 
-import com.hrusch.webapp.model.TimeDto;
-import com.hrusch.webapp.model.Track;
+import com.hrusch.webapp.model.dto.TimeDto;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;

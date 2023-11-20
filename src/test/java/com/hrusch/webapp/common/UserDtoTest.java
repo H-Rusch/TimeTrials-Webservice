@@ -2,8 +2,8 @@ package com.hrusch.webapp.common;
 
 import com.hrusch.webapp.TimeUtil;
 import com.hrusch.webapp.UserUtil;
-import com.hrusch.webapp.model.TimeDto;
-import com.hrusch.webapp.model.UserDto;
+import com.hrusch.webapp.model.dto.TimeDto;
+import com.hrusch.webapp.model.dto.UserDto;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;

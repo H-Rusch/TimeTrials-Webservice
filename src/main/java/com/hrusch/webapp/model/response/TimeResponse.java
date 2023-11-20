@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import com.hrusch.webapp.model.TimeDto;
+import com.hrusch.webapp.model.dto.TimeDto;
 import com.hrusch.webapp.model.Track;
 import com.hrusch.webapp.model.serialization.CustomDurationDeserializer;
 import com.hrusch.webapp.model.serialization.CustomDurationSerializer;
