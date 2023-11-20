@@ -1,4 +1,4 @@
-package com.hrusch.webapp.repository;
+package com.hrusch.webapp.model;
 
 import com.hrusch.webapp.UserUtil;
 import com.hrusch.webapp.model.UserEntity;

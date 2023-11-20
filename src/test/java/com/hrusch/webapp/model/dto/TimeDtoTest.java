@@ -1,4 +1,4 @@
-package com.hrusch.webapp.common;
+package com.hrusch.webapp.model.dto;
 
 import com.hrusch.webapp.TimeUtil;
 import com.hrusch.webapp.UserUtil;

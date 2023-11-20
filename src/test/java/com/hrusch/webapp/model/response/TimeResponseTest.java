@@ -1,4 +1,4 @@
-package com.hrusch.webapp.io.response;
+package com.hrusch.webapp.model.response;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

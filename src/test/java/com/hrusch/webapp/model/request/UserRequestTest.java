@@ -1,4 +1,4 @@
-package com.hrusch.webapp.io.request;
+package com.hrusch.webapp.model.request;
 
 import com.hrusch.webapp.model.request.UserRequest;
 import jakarta.validation.Validation;
