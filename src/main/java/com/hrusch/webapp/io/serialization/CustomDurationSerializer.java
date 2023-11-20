@@ -1,4 +1,4 @@
-package com.hrusch.webapp.serialization;
+package com.hrusch.webapp.io.serialization;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
