@@ -1,4 +1,4 @@
-package com.hrusch.webapp.io.request.validation;
+package com.hrusch.webapp.model.request.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

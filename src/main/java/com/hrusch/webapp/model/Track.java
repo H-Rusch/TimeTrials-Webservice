@@ -1,4 +1,4 @@
-package com.hrusch.webapp.common;
+package com.hrusch.webapp.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;

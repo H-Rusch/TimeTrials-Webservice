@@ -1,6 +1,6 @@
-package com.hrusch.webapp.common;
+package com.hrusch.webapp.model;
 
-import com.hrusch.webapp.io.request.UserRequest;
+import com.hrusch.webapp.model.request.UserRequest;
 import com.hrusch.webapp.repository.UserEntity;
 import lombok.Builder;
 import lombok.Getter;

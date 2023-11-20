@@ -1,6 +1,6 @@
-package com.hrusch.webapp.common;
+package com.hrusch.webapp.model;
 
-import com.hrusch.webapp.io.request.TimeRequest;
+import com.hrusch.webapp.model.request.TimeRequest;
 import com.hrusch.webapp.repository.TimeEntity;
 import lombok.Builder;
 import lombok.Data;

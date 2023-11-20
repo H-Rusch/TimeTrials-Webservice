@@ -1,11 +1,11 @@
-package com.hrusch.webapp.io.request;
+package com.hrusch.webapp.model.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.hrusch.webapp.common.Track;
-import com.hrusch.webapp.io.serialization.CustomDurationDeserializer;
-import com.hrusch.webapp.io.serialization.CustomDurationSerializer;
+import com.hrusch.webapp.model.Track;
+import com.hrusch.webapp.model.serialization.CustomDurationDeserializer;
+import com.hrusch.webapp.model.serialization.CustomDurationSerializer;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

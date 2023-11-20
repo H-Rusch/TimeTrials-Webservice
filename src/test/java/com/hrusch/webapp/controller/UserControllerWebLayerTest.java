@@ -1,11 +1,11 @@
-package com.hrusch.webapp.io.controller;
+package com.hrusch.webapp.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hrusch.webapp.common.UserDto;
+import com.hrusch.webapp.model.UserDto;
 import com.hrusch.webapp.exception.UsernameAlreadyTakenException;
-import com.hrusch.webapp.io.request.UserRequest;
-import com.hrusch.webapp.io.response.UserResponse;
-import com.hrusch.webapp.io.response.ValidationErrorResponse;
+import com.hrusch.webapp.model.request.UserRequest;
+import com.hrusch.webapp.model.response.UserResponse;
+import com.hrusch.webapp.model.response.ValidationErrorResponse;
 import com.hrusch.webapp.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

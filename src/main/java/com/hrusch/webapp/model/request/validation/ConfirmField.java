@@ -1,4 +1,4 @@
-package com.hrusch.webapp.io.request.validation;
+package com.hrusch.webapp.model.request.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
@@ -8,12 +8,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Constraint(validatedBy = PasswordFormatValidator.class)
-@Target({ElementType.FIELD})
+@Constraint(validatedBy = ConfirmFieldValidator.class)
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface PasswordFormat {
+public @interface ConfirmField {
 
-    String message() default "{user.password.invalidFormat}";
+    String message() default "The fields do not match.";
+
+    String original();
+
+    String confirmation();
 
     Class<?>[] groups() default {};
 

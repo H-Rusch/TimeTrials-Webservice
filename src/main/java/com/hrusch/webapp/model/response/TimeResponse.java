@@ -1,14 +1,14 @@
-package com.hrusch.webapp.io.response;
+package com.hrusch.webapp.model.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import com.hrusch.webapp.common.TimeDto;
-import com.hrusch.webapp.common.Track;
-import com.hrusch.webapp.io.serialization.CustomDurationDeserializer;
-import com.hrusch.webapp.io.serialization.CustomDurationSerializer;
+import com.hrusch.webapp.model.TimeDto;
+import com.hrusch.webapp.model.Track;
+import com.hrusch.webapp.model.serialization.CustomDurationDeserializer;
+import com.hrusch.webapp.model.serialization.CustomDurationSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

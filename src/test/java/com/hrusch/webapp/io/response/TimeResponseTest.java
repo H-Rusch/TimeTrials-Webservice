@@ -3,7 +3,8 @@ package com.hrusch.webapp.io.response;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hrusch.webapp.TimeUtil;
-import com.hrusch.webapp.common.Track;
+import com.hrusch.webapp.model.Track;
+import com.hrusch.webapp.model.response.TimeResponse;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;

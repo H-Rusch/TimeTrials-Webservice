@@ -1,9 +1,9 @@
-package com.hrusch.webapp.io.controller;
+package com.hrusch.webapp.controller;
 
-import com.hrusch.webapp.common.UserDto;
+import com.hrusch.webapp.model.UserDto;
 import com.hrusch.webapp.exception.UsernameAlreadyTakenException;
-import com.hrusch.webapp.io.request.UserRequest;
-import com.hrusch.webapp.io.response.UserResponse;
+import com.hrusch.webapp.model.request.UserRequest;
+import com.hrusch.webapp.model.response.UserResponse;
 import com.hrusch.webapp.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

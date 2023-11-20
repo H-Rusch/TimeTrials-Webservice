@@ -1,4 +1,4 @@
-package com.hrusch.webapp.io.response;
+package com.hrusch.webapp.model.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

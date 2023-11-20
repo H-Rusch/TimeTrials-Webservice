@@ -2,7 +2,8 @@ package com.hrusch.webapp.io.request;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hrusch.webapp.common.Track;
+import com.hrusch.webapp.model.Track;
+import com.hrusch.webapp.model.request.TimeRequest;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;

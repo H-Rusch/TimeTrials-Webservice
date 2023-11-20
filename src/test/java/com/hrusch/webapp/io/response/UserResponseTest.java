@@ -1,6 +1,7 @@
 package com.hrusch.webapp.io.response;
 
 import com.hrusch.webapp.UserUtil;
+import com.hrusch.webapp.model.response.UserResponse;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;

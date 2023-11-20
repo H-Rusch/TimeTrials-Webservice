@@ -1,6 +1,6 @@
 package com.hrusch.webapp.service;
 
-import com.hrusch.webapp.common.TimeDto;
+import com.hrusch.webapp.model.TimeDto;
 import com.hrusch.webapp.exception.UserDoesNotExistException;
 import com.hrusch.webapp.repository.TimeEntity;
 import com.hrusch.webapp.repository.TimeRepository;

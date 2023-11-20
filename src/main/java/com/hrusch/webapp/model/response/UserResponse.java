@@ -1,6 +1,6 @@
-package com.hrusch.webapp.io.response;
+package com.hrusch.webapp.model.response;
 
-import com.hrusch.webapp.common.UserDto;
+import com.hrusch.webapp.model.UserDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

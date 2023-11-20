@@ -1,9 +1,9 @@
-package com.hrusch.webapp.io.controller;
+package com.hrusch.webapp.controller;
 
-import com.hrusch.webapp.common.TimeDto;
+import com.hrusch.webapp.model.TimeDto;
 import com.hrusch.webapp.exception.UserDoesNotExistException;
-import com.hrusch.webapp.io.request.TimeRequest;
-import com.hrusch.webapp.io.response.TimeResponse;
+import com.hrusch.webapp.model.request.TimeRequest;
+import com.hrusch.webapp.model.response.TimeResponse;
 import com.hrusch.webapp.service.TimeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

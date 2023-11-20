@@ -1,13 +1,13 @@
-package com.hrusch.webapp.io.controller;
+package com.hrusch.webapp.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hrusch.webapp.TimeUtil;
-import com.hrusch.webapp.common.TimeDto;
-import com.hrusch.webapp.common.Track;
+import com.hrusch.webapp.model.TimeDto;
+import com.hrusch.webapp.model.Track;
 import com.hrusch.webapp.exception.UserDoesNotExistException;
-import com.hrusch.webapp.io.request.TimeRequest;
-import com.hrusch.webapp.io.response.TimeResponse;
-import com.hrusch.webapp.io.response.ValidationErrorResponse;
+import com.hrusch.webapp.model.request.TimeRequest;
+import com.hrusch.webapp.model.response.TimeResponse;
+import com.hrusch.webapp.model.response.ValidationErrorResponse;
 import com.hrusch.webapp.service.TimeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
