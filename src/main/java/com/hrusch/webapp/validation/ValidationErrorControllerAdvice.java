@@ -1,7 +1,5 @@
-package com.hrusch.webapp.model.request.validation;
+package com.hrusch.webapp.validation;
 
-import com.hrusch.webapp.model.response.ValidationError;
-import com.hrusch.webapp.model.response.ValidationErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;

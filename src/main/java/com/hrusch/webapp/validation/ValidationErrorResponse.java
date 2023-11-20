@@ -1,4 +1,4 @@
-package com.hrusch.webapp.model.response;
+package com.hrusch.webapp.validation;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
