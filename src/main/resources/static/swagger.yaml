@@ -96,7 +96,7 @@ paths:
                 username: 'Username'
                 track: '[GCN] Baby Park'
                 time: '1:05.480'
-                createdAt: '2023-11-20@15:28:15'
+                createdAt: '2023-11-20 15:28:15'
         '409':
           description: CONFLICT the given user does not exist
           content:
@@ -210,4 +210,4 @@ components:
           type: string
         createdAt:
           type: string
-          description: Timestamp when the time was created in the format 'yyyy-MM-dd@HH:mm:ss'
+          description: Timestamp when the time was created in the format 'yyyy-MM-dd HH:mm:ss'
