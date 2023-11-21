@@ -1,6 +1,5 @@
 package com.hrusch.webapp.model.request;
 
-import com.hrusch.webapp.model.request.UserRequest;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
