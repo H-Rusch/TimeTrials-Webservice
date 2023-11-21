@@ -15,9 +15,9 @@ public class CustomDurationDeserializer extends JsonDeserializer<Duration> {
 
     @Override
     public Duration deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-        var a = jsonParser.getValueAsString();
+        var durationString = jsonParser.getValueAsString();
 
-        var matcher = DURATION_PATTERN.matcher(a);
+        var matcher = DURATION_PATTERN.matcher(durationString);
         if (!matcher.matches()) {
             throw new DurationDeserializationException("Duration does not match specified format.");
         }

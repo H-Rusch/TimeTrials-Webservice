@@ -1,13 +1,14 @@
 package com.hrusch.webapp.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.hrusch.webapp.TimeUtil;
 import com.hrusch.webapp.exception.UserDoesNotExistException;
 import com.hrusch.webapp.model.Track;
 import com.hrusch.webapp.model.dto.TimeDto;
+import com.hrusch.webapp.model.errorResponse.ApiError;
 import com.hrusch.webapp.model.request.TimeRequest;
 import com.hrusch.webapp.service.TimeService;
-import com.hrusch.webapp.validation.ValidationErrorResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
@@ -45,12 +46,16 @@ class TimeControllerWebLayerTest {
 
     TimeRequest requestModel;
 
+    private ObjectMapper objectMapper;
+
     @BeforeEach
     void setUp() {
         requestModel = createTimeRequestModel();
         var returnedDto = createTimeDtoFromRequestModel(requestModel);
         when(modelMapper.map(any(TimeRequest.class), eq(TimeDto.class)))
                 .thenReturn(returnedDto);
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
     }
 
     @Test
@@ -64,7 +69,7 @@ class TimeControllerWebLayerTest {
         MvcResult mvcResult = mockMvc.perform(requestBuilder)
                 .andExpect(status().isCreated())
                 .andReturn();
-        TimeDto savedTime = new ObjectMapper()
+        TimeDto savedTime = objectMapper
                 .readValue(mvcResult.getResponse().getContentAsString(), TimeDto.class);
 
         assertThat(mvcResult.getResponse().getStatus()).isEqualTo(HttpStatus.CREATED.value());
@@ -81,10 +86,13 @@ class TimeControllerWebLayerTest {
         RequestBuilder requestBuilder = buildRequest(requestModel);
 
         MvcResult mvcResult = mockMvc.perform(requestBuilder).andReturn();
+        ApiError apiError = objectMapper
+                .readValue(mvcResult.getResponse().getContentAsString(), ApiError.class);
 
         assertThat(mvcResult.getResponse().getStatus()).isEqualTo(HttpStatus.CONFLICT.value());
-        assertThat(mvcResult.getResponse().getContentAsString()).startsWith("User with the userId");
-        assertThat(mvcResult.getResponse().getContentAsString()).endsWith("does not exist.");
+        assertThat(apiError.getMessage()).startsWith("User with the userId");
+        assertThat(apiError.getMessage()).endsWith("does not exist.");
+        assertThat(apiError.getSubErrors()).isNull();
     }
 
     @Test
@@ -95,17 +103,17 @@ class TimeControllerWebLayerTest {
         RequestBuilder requestBuilder = buildRequest(requestModel);
 
         MvcResult mvcResult = mockMvc.perform(requestBuilder).andReturn();
-        ValidationErrorResponse response = new ObjectMapper()
-                .readValue(mvcResult.getResponse().getContentAsString(), ValidationErrorResponse.class);
+        ApiError apiError = objectMapper
+                .readValue(mvcResult.getResponse().getContentAsString(), ApiError.class);
 
         assertThat(mvcResult.getResponse().getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.getViolations()).hasSize(3);
+        assertThat(apiError.getSubErrors()).hasSize(3);
     }
 
     private RequestBuilder buildRequest(TimeRequest requestModel) throws Exception {
         return MockMvcRequestBuilders.post(ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
-                .content(new ObjectMapper().writeValueAsString(requestModel));
+                .content(objectMapper.writeValueAsString(requestModel));
     }
 }
