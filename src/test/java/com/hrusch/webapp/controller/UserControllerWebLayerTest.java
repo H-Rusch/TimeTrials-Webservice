@@ -1,11 +1,12 @@
 package com.hrusch.webapp.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.hrusch.webapp.exception.UsernameAlreadyTakenException;
 import com.hrusch.webapp.model.dto.UserDto;
+import com.hrusch.webapp.model.errorResponse.ApiError;
 import com.hrusch.webapp.model.request.UserRequest;
 import com.hrusch.webapp.service.UserService;
-import com.hrusch.webapp.validation.ValidationErrorResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
@@ -42,11 +43,15 @@ class UserControllerWebLayerTest {
 
     UserRequest requestModel;
 
+    private ObjectMapper objectMapper;
+
     @BeforeEach
     void setUp() {
         requestModel = createUserRequestModel();
         when(modelMapper.map(any(), any()))
                 .thenReturn(createUserDtoFromRequestModel(requestModel));
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
     }
 
     @Test
@@ -56,7 +61,7 @@ class UserControllerWebLayerTest {
         RequestBuilder requestBuilder = buildRequest(requestModel);
 
         MvcResult mvcResult = mockMvc.perform(requestBuilder).andReturn();
-        UserDto createdUser = new ObjectMapper()
+        UserDto createdUser = objectMapper
                 .readValue(mvcResult.getResponse().getContentAsString(), UserDto.class);
 
         assertThat(mvcResult.getResponse().getStatus()).isEqualTo(HttpStatus.CREATED.value());
@@ -73,9 +78,12 @@ class UserControllerWebLayerTest {
         RequestBuilder requestBuilder = buildRequest(requestModel);
 
         MvcResult mvcResult = mockMvc.perform(requestBuilder).andReturn();
+        ApiError apiError = objectMapper
+                .readValue(mvcResult.getResponse().getContentAsString(), ApiError.class);
 
         assertThat(mvcResult.getResponse().getStatus()).isEqualTo(HttpStatus.CONFLICT.value());
-        assertThat(mvcResult.getResponse().getContentAsString()).startsWith("The username has already been taken");
+        assertThat(apiError.getSubErrors()).isNull();
+        assertThat(apiError.getMessage()).startsWith("The username has already been taken");
     }
 
     @Test
@@ -84,17 +92,17 @@ class UserControllerWebLayerTest {
         RequestBuilder requestBuilder = buildRequest(requestModel);
 
         MvcResult mvcResult = mockMvc.perform(requestBuilder).andReturn();
-        ValidationErrorResponse response = new ObjectMapper()
-                .readValue(mvcResult.getResponse().getContentAsString(), ValidationErrorResponse.class);
+        ApiError apiError = objectMapper
+                .readValue(mvcResult.getResponse().getContentAsString(), ApiError.class);
 
         assertThat(mvcResult.getResponse().getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.getViolations()).hasSize(3);
+        assertThat(apiError.getSubErrors()).hasSize(3);
     }
 
     private RequestBuilder buildRequest(UserRequest requestModel) throws Exception {
         return MockMvcRequestBuilders.post(ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
-                .content(new ObjectMapper().writeValueAsString(requestModel));
+                .content(objectMapper.writeValueAsString(requestModel));
     }
 }

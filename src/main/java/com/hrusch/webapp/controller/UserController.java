@@ -44,13 +44,6 @@ public class UserController {
                 .body(createdUser);
     }
 
-    @ExceptionHandler(UsernameAlreadyTakenException.class)
-    public ResponseEntity<Object> handleException(UsernameAlreadyTakenException e) {
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(e.getMessage());
-    }
-
     UserDto convertToDto(UserRequest userRequest) {
         UserDto userDto = modelMapper.map(userRequest, UserDto.class);
         userDto.setUserId(UUID.randomUUID().toString());
