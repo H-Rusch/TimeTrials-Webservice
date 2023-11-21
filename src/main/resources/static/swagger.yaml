@@ -1,0 +1,168 @@
+openapi: 3.0.0
+info:
+  title: Time Trial API
+  description: 'API for saving times driven in Mario Kart 8 Deluxe Time Trials'
+  version: v0.1
+  contact:
+    name: H-Rusch
+    url: 'https://github.com/H-Rusch/SpringBoot-API/issues'
+tags:
+  - name: users-api
+    description: API to store users in the database
+  - name: times-api
+    description: API to store times for users in the database
+paths:
+  /users:
+    post:
+      tags:
+        - users-api
+      summary: Create a user
+      requestBody:
+        description: The user to create. The 'password' and 'repeatedPassword' fields have to match.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+            example:
+              username: 'Username'
+              password: 'Password123'
+              repeatedPassword: 'Password123'
+      responses:
+        '201':
+          description: The created user object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+              example:
+                userId: '4c8eac33-15ed-4ddd-b8cd-8f836d641ec5'
+                username: 'Username'
+        '409':
+          description: CONFLICT as username is already taken
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: 'The username has already been taken: Username'
+
+        '400':
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+              example:
+                ValidationErrorResponseExample:
+                  violations:
+                    - identifier: 'password'
+                      errorMessage: 'The given password has an invalid format. It must contain a letter and a digit.'
+                    - identifier: 'repeatedPassword'
+                      errorMessage: 'The given password has an invalid format. It must contain a letter and a digit.'
+
+  /times:
+    post:
+      tags:
+        - times-api
+      summary: Create a time for a user
+      requestBody:
+        description: The time to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimeRequest'
+            example:
+              userId: '4c8eac33-15ed-4ddd-b8cd-8f836d641ec5'
+              track: 'BABY_PARK_GCN'
+              time: '1:05.480'
+      responses:
+        '201':
+          description: The created time object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeDto'
+              example:
+                username: 'Username'
+                track: '[GCN] Baby Park'
+                time: '1:05.480'
+                createdAt: '2023-11-20@15:28:15'
+        '409':
+          description: CONFLICT the given user does not exist
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: 'User with the userId 4c8eac33-15ed-4ddd-b8cd-8f836d641ec5 does not exist.'
+        '400':
+          description: BAD REQUEST
+
+components:
+  schemas:
+    ValidationErrorResponse:
+      type: object
+      properties:
+        violations:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationError'
+    ValidationError:
+      type: object
+      properties:
+        identifier:
+          type: string
+          description: Identifier of the field which contained an error
+        errorMessage:
+          type: string
+          description: Error message detailing what went wrong in the field referenced by 'identifier'
+    UserDto:
+      type: object
+      properties:
+        userId:
+          type: string
+        username:
+          type: string
+    UserRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 24
+        password:
+          type: string
+          minLength: 8
+        repeatedPassword:
+          type: string
+          minLength: 8
+      required:
+        - username
+        - password
+        - repeatedPassword
+
+    TimeRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+          description: UUID of the user. A user with that id has to be present in the database
+        track:
+          type: string
+          description: The track the time was created for. This has to match either the ENUM constant or the enum constant's pretty name.
+        time:
+          type: string
+          description: The driven time. It has to be given in the format M:SS.msmsms
+    TimeDto:
+      type: object
+      properties:
+        username:
+          type: string
+        track:
+          type: string
+          description: Pretty name for the track
+        time:
+          type: string
+        createdAt:
+          type: string
+          description: Timestamp when the time was created in the format 'yyyy-MM-dd@HH:mm:ss'
