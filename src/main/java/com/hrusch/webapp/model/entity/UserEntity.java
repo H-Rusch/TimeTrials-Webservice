@@ -1,4 +1,4 @@
-package com.hrusch.webapp.model;
+package com.hrusch.webapp.model.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

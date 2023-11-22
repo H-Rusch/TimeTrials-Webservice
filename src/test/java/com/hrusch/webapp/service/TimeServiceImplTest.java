@@ -1,7 +1,7 @@
 package com.hrusch.webapp.service;
 
 import com.hrusch.webapp.exception.UserDoesNotExistException;
-import com.hrusch.webapp.model.TimeEntity;
+import com.hrusch.webapp.model.entity.TimeEntity;
 import com.hrusch.webapp.model.dto.TimeDto;
 import com.hrusch.webapp.repository.TimeRepository;
 import org.junit.jupiter.api.Test;

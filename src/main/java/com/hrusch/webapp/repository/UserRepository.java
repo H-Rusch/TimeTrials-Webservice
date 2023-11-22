@@ -1,6 +1,6 @@
 package com.hrusch.webapp.repository;
 
-import com.hrusch.webapp.model.UserEntity;
+import com.hrusch.webapp.model.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

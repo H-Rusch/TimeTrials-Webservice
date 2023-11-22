@@ -1,6 +1,6 @@
 package com.hrusch.webapp;
 
-import com.hrusch.webapp.model.UserEntity;
+import com.hrusch.webapp.model.entity.UserEntity;
 import com.hrusch.webapp.model.dto.UserDto;
 import com.hrusch.webapp.model.request.UserRequest;
 import org.modelmapper.ModelMapper;
