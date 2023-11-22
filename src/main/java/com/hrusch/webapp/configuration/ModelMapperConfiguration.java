@@ -1,4 +1,4 @@
-package com.hrusch.webapp.model;
+package com.hrusch.webapp.configuration;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
