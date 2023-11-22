@@ -94,7 +94,7 @@ paths:
                 $ref: '#/components/schemas/TimeDto'
               example:
                 username: 'Username'
-                track: '[GCN] Baby Park'
+                track: 'GCN Baby Park'
                 time: '1:05.480'
                 createdAt: '2023-11-20 15:28:15'
         '409':
