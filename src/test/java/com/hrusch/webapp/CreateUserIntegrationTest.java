@@ -44,7 +44,7 @@ class CreateUserIntegrationTest {
     }
 
     @Test
-    void creatingUser_whenSendingValidUserRequest_return200Response() {
+    void creatingUser_whenSendingValidUserRequest_return201Response() {
         UserRequest userRequest = UserUtil.createUserRequestModel();
 
         ResponseEntity<UserDto> response = restTemplate.postForEntity(baseUrl, userRequest, UserDto.class);
