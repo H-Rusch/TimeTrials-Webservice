@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 public class TimeEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "track", nullable = false)
