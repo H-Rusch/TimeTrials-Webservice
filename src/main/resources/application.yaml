@@ -1,0 +1,8 @@
+spring.main.banner-mode: off
+security.ignored: /**
+
+springdoc.swagger-ui.url: /swagger.yaml
+
+spring.jpa:
+  show-sql: true
+  properties.hibernate.format_sql: true
