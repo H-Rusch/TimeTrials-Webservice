@@ -1,9 +1,9 @@
 package com.hrusch.webapp;
 
-import com.hrusch.webapp.model.entity.TimeEntity;
 import com.hrusch.webapp.model.Track;
-import com.hrusch.webapp.model.entity.UserEntity;
 import com.hrusch.webapp.model.dto.TimeDto;
+import com.hrusch.webapp.model.entity.TimeEntity;
+import com.hrusch.webapp.model.entity.UserEntity;
 import com.hrusch.webapp.model.request.TimeRequest;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;

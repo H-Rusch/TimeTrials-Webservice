@@ -1,9 +1,11 @@
 package com.hrusch.webapp.service;
 
 import com.hrusch.webapp.exception.UserDoesNotExistException;
+import com.hrusch.webapp.exception.UserIdNotFoundException;
 import com.hrusch.webapp.exception.UsernameAlreadyTakenException;
-import com.hrusch.webapp.model.entity.UserEntity;
+import com.hrusch.webapp.exception.UsernameNotFoundException;
 import com.hrusch.webapp.model.dto.UserDto;
+import com.hrusch.webapp.model.entity.UserEntity;
 import com.hrusch.webapp.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -49,8 +51,20 @@ public class UserServiceImpl implements UserService {
         var entity = userRepository.findByUserId(userId);
 
         if (entity.isEmpty()) {
-            LOG.warn("Trying to find user with userId {} failed, since no user with this userId exists", userId);
-            throw new UserDoesNotExistException(userId);
+            LOG.warn("Trying to find user with userId {} failed, as no user with this userId exists", userId);
+            throw new UserIdNotFoundException(userId);
+        }
+
+        return entity.get();
+    }
+
+    @Override
+    public UserEntity findUserByUsername(String username) throws UserDoesNotExistException {
+        var entity = userRepository.findByUsername(username);
+
+        if (entity.isEmpty()) {
+            LOG.warn("Trying to find user with username '{}' failed, as no user with this username exists", username);
+            throw new UsernameNotFoundException(username);
         }
 
         return entity.get();

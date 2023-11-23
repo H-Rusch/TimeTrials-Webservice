@@ -2,8 +2,8 @@ package com.hrusch.webapp.service;
 
 import com.hrusch.webapp.exception.UserDoesNotExistException;
 import com.hrusch.webapp.exception.UsernameAlreadyTakenException;
-import com.hrusch.webapp.model.entity.UserEntity;
 import com.hrusch.webapp.model.dto.UserDto;
+import com.hrusch.webapp.model.entity.UserEntity;
 import com.hrusch.webapp.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

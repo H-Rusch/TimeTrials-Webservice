@@ -1,6 +1,7 @@
 package com.hrusch.webapp.controller;
 
 import com.hrusch.webapp.exception.UserDoesNotExistException;
+import com.hrusch.webapp.model.Track;
 import com.hrusch.webapp.model.dto.TimeDto;
 import com.hrusch.webapp.model.request.TimeRequest;
 import com.hrusch.webapp.service.TimeService;
@@ -9,12 +10,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -43,10 +43,39 @@ public class TimeController {
 
         TimeDto createdTime = timeService.saveTime(timeDto);
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(createdTime);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdTime);
     }
+
+    /**
+     * Get the best time for each track from the database.
+     * Optionally a user can be specified, in order to get the best times for that user.
+     */
+    @GetMapping(path = "/best")
+    public ResponseEntity<List<TimeDto>> getBestTimes(@RequestParam(required = false) String username) throws UserDoesNotExistException {
+        List<TimeDto> times = username == null ? timeService.getBestTimes() : timeService.getBestTimes(username);
+
+        if (times.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        } else {
+            return ResponseEntity.status(HttpStatus.OK).body(times);
+        }
+    }
+
+    /**
+     * Get the best time for a track.
+     * Optionally a user can be specified, in order to get the best time on that track for that specific user.
+     */
+    @GetMapping(path = "/best/{track}")
+    public ResponseEntity<TimeDto> getBestTime(
+            @PathVariable Track track,
+            @RequestParam(required = false) String username
+    ) throws UserDoesNotExistException {
+        Optional<TimeDto> time = username == null ? timeService.getBestTimeForTrack(track) : timeService.getBestTimeForTrack(track, username);
+
+        return time.map(timeDto -> ResponseEntity.status(HttpStatus.OK).body(timeDto))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NO_CONTENT).body(null));
+    }
+
 
     TimeDto convertToTimeDto(TimeRequest timeRequest) {
         TimeDto timeDto = modelMapper.map(timeRequest, TimeDto.class);
