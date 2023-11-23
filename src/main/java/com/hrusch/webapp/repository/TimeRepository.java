@@ -17,10 +17,10 @@ public interface TimeRepository extends JpaRepository<TimeEntity, Long> {
 
     Optional<TimeEntity> findFirstByTrackAndUser_IdOrderByTimeAsc(Track track, Long idOfUser);
 
-    @Query("SELECT t FROM TimeEntity t WHERE t.time IN (SELECT MIN(ti.time) FROM TimeEntity ti WHERE ti.track = t.track)")
+    @Query("SELECT t FROM TimeEntity t WHERE t.time = (SELECT MIN(ti.time) FROM TimeEntity ti WHERE ti.track = t.track)")
     List<TimeEntity> findBestTimeForEachTrack();
 
-    @Query("SELECT t FROM TimeEntity t WHERE t.user.id = :user_id AND t.time IN "
-            + "(SELECT tt FROM TimeEntity tt WHERE tt.user.id = :user_id GROUP BY tt.track HAVING tt.time = MIN(tt.time))")
+    @Query("SELECT t FROM TimeEntity t WHERE t.user.id = :user_id AND t.time = "
+            + "(SELECT MIN(ti.time) FROM TimeEntity ti WHERE ti.user.id = :user_id AND ti.track = t.track)")
     List<TimeEntity> findBestTimeForEachTrack(@Param("user_id") Long idOfUser);
 }
