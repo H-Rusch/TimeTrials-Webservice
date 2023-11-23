@@ -1,5 +1,7 @@
-package com.hrusch.webapp;
+package com.hrusch.webapp.integration_tests;
 
+import com.hrusch.webapp.TimeUtil;
+import com.hrusch.webapp.UserUtil;
 import com.hrusch.webapp.model.dto.TimeDto;
 import com.hrusch.webapp.model.dto.UserDto;
 import com.hrusch.webapp.model.request.TimeRequest;

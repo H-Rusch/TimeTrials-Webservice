@@ -1,5 +1,6 @@
-package com.hrusch.webapp;
+package com.hrusch.webapp.integration_tests;
 
+import com.hrusch.webapp.UserUtil;
 import com.hrusch.webapp.model.dto.UserDto;
 import com.hrusch.webapp.model.errorResponse.ApiError;
 import com.hrusch.webapp.model.request.UserRequest;
