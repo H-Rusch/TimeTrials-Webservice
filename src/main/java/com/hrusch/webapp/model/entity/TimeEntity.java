@@ -1,5 +1,6 @@
-package com.hrusch.webapp.model;
+package com.hrusch.webapp.model.entity;
 
+import com.hrusch.webapp.model.Track;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,7 +19,7 @@ import java.time.LocalDateTime;
 public class TimeEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "track", nullable = false)

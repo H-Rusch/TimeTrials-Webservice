@@ -1,15 +1,19 @@
 package com.hrusch.webapp.service;
 
 import com.hrusch.webapp.exception.UserDoesNotExistException;
-import com.hrusch.webapp.model.TimeEntity;
-import com.hrusch.webapp.model.UserEntity;
+import com.hrusch.webapp.model.Track;
 import com.hrusch.webapp.model.dto.TimeDto;
+import com.hrusch.webapp.model.entity.TimeEntity;
+import com.hrusch.webapp.model.entity.UserEntity;
 import com.hrusch.webapp.repository.TimeRepository;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TimeServiceImpl implements TimeService {
@@ -36,6 +40,40 @@ public class TimeServiceImpl implements TimeService {
         LOG.info("Saved new time for user with user-id: {}", createdTime.getUser().getUserId());
 
         return convertToTimeDto(timeEntity);
+    }
+
+    @Override
+    public List<TimeDto> getBestTimes() {
+        var times = timeRepository.findBestTimeForEachTrack();
+
+        return convertEntitiesToTimeDtos(times);
+    }
+
+    @Override
+    public List<TimeDto> getBestTimes(String username) throws UserDoesNotExistException {
+        var userEntity = userService.findUserByUsername(username);
+        var times = timeRepository.findBestTimeForEachTrack(userEntity.getId());
+
+        return convertEntitiesToTimeDtos(times);
+    }
+
+    @Override
+    public Optional<TimeDto> getBestTimeForTrack(Track track) {
+        var time = timeRepository.findFirstByTrackOrderByTimeAsc(track);
+
+        return time.map(this::convertToTimeDto);
+    }
+
+    @Override
+    public Optional<TimeDto> getBestTimeForTrack(Track track, String username) throws UserDoesNotExistException {
+        var userEntity = userService.findUserByUsername(username);
+        var time = timeRepository.findFirstByTrackAndUser_IdOrderByTimeAsc(track, userEntity.getId());
+
+        return time.map(this::convertToTimeDto);
+    }
+
+    private List<TimeDto> convertEntitiesToTimeDtos(List<TimeEntity> entities) {
+        return entities.stream().map(this::convertToTimeDto).toList();
     }
 
     TimeEntity convertToTimeEntity(TimeDto timeDto, UserEntity userEntity) {

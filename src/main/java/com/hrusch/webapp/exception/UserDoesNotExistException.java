@@ -1,8 +1,8 @@
 package com.hrusch.webapp.exception;
 
-public class UserDoesNotExistException extends Exception {
+public abstract class UserDoesNotExistException extends Exception {
 
-    public UserDoesNotExistException(String userId) {
-        super(String.format("User with the userId %s does not exist.", userId));
+    UserDoesNotExistException(String identifyingField, String value) {
+        super(String.format("User with the %s '%s' does not exist.", identifyingField, value));
     }
 }

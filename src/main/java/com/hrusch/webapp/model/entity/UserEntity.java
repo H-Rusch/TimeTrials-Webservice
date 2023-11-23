@@ -1,4 +1,4 @@
-package com.hrusch.webapp.model;
+package com.hrusch.webapp.model.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -18,7 +18,7 @@ import java.util.Set;
 public class UserEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "user_id", nullable = false, unique = true)

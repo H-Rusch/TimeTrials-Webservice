@@ -3,7 +3,7 @@ package com.hrusch.webapp.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.hrusch.webapp.TimeUtil;
-import com.hrusch.webapp.exception.UserDoesNotExistException;
+import com.hrusch.webapp.exception.UserIdNotFoundException;
 import com.hrusch.webapp.model.Track;
 import com.hrusch.webapp.model.dto.TimeDto;
 import com.hrusch.webapp.model.errorResponse.ApiError;
@@ -23,11 +23,16 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static com.hrusch.webapp.TimeUtil.createTimeDtoFromRequestModel;
-import static com.hrusch.webapp.TimeUtil.createTimeRequestModel;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static com.hrusch.webapp.TimeUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -64,7 +69,7 @@ class TimeControllerWebLayerTest {
         returnedDto.setUsername("Testing 123");
         when(timeService.saveTime(any(TimeDto.class)))
                 .thenReturn(returnedDto);
-        RequestBuilder requestBuilder = buildRequest(requestModel);
+        RequestBuilder requestBuilder = buildAddTimeRequest(requestModel);
 
         MvcResult mvcResult = mockMvc.perform(requestBuilder)
                 .andExpect(status().isCreated())
@@ -82,8 +87,8 @@ class TimeControllerWebLayerTest {
     @Test
     void saveTime_whenTimeRequestForNotPresentUserProvided_returnError() throws Exception {
         when(timeService.saveTime(any(TimeDto.class)))
-                .thenThrow(new UserDoesNotExistException(requestModel.getUserId()));
-        RequestBuilder requestBuilder = buildRequest(requestModel);
+                .thenThrow(new UserIdNotFoundException(requestModel.getUserId()));
+        RequestBuilder requestBuilder = buildAddTimeRequest(requestModel);
 
         MvcResult mvcResult = mockMvc.perform(requestBuilder).andReturn();
         ApiError apiError = objectMapper
@@ -100,7 +105,7 @@ class TimeControllerWebLayerTest {
         requestModel.setTrack(null);
         requestModel.setTime(null);
         requestModel.setUserId(null);
-        RequestBuilder requestBuilder = buildRequest(requestModel);
+        RequestBuilder requestBuilder = buildAddTimeRequest(requestModel);
 
         MvcResult mvcResult = mockMvc.perform(requestBuilder).andReturn();
         ApiError apiError = objectMapper
@@ -110,10 +115,134 @@ class TimeControllerWebLayerTest {
         assertThat(apiError.getSubErrors()).hasSize(3);
     }
 
-    private RequestBuilder buildRequest(TimeRequest requestModel) throws Exception {
+    private RequestBuilder buildAddTimeRequest(TimeRequest requestModel) throws Exception {
         return MockMvcRequestBuilders.post(ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestModel));
+    }
+
+    @Test
+    void getBestTimes_whenNoTimesInDatabase_return204HttpCode() throws Exception {
+        when(timeService.getBestTimes()).thenReturn(Collections.emptyList());
+        RequestBuilder requestBuilder = buildGetBestTimesRequest(null);
+
+        MvcResult mvcResult = mockMvc.perform(requestBuilder)
+                .andExpect(status().isNoContent())
+                .andReturn();
+
+        assertThat(mvcResult.getResponse().getContentAsString()).isEmpty();
+    }
+
+    @Test
+    void getBestTimes_whenNoTimesForUserInDatabase_return204HttpCode() throws Exception {
+        when(timeService.getBestTimes(anyString())).thenReturn(Collections.emptyList());
+        RequestBuilder requestBuilder = buildGetBestTimesRequest("username");
+
+        MvcResult mvcResult = mockMvc.perform(requestBuilder)
+                .andExpect(status().isNoContent())
+                .andReturn();
+
+        assertThat(mvcResult.getResponse().getContentAsString()).isEmpty();
+    }
+
+    @Test
+    void getBestTimes_whenTimesInDatabase_returnList() throws Exception {
+        when(timeService.getBestTimes()).thenReturn(List.of(createTimeDto(UUID.randomUUID())));
+        RequestBuilder requestBuilder = buildGetBestTimesRequest(null);
+
+        MvcResult mvcResult = mockMvc.perform(requestBuilder)
+                .andExpect(status().isOk())
+                .andReturn();
+        TimeDto[] times = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), TimeDto[].class);
+
+        assertThat(times).hasSize(1);
+    }
+
+    @Test
+    void getBestTimes_whenTimesForUserInDatabase_returnList() throws Exception {
+        when(timeService.getBestTimes(anyString())).thenReturn(List.of(createTimeDto(UUID.randomUUID())));
+        RequestBuilder requestBuilder = buildGetBestTimesRequest("Username");
+
+        MvcResult mvcResult = mockMvc.perform(requestBuilder)
+                .andExpect(status().isOk())
+                .andReturn();
+        TimeDto[] times = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), TimeDto[].class);
+
+        assertThat(times).hasSize(1);
+    }
+
+    private RequestBuilder buildGetBestTimesRequest(String username) {
+        var requestBuilder = MockMvcRequestBuilders.get(ENDPOINT + "/best");
+
+        if (username != null) {
+            requestBuilder.param("username", username);
+        }
+
+        return requestBuilder;
+    }
+
+    @Test
+    void getBestTime_whenNoTimesInDatabase_return204HttpCode() throws Exception {
+        var track = Track.WATER_PARK;
+        when(timeService.getBestTimeForTrack(any(Track.class))).thenReturn(Optional.empty());
+        RequestBuilder requestBuilder = buildGetBestTimeRequest(track, null);
+
+        MvcResult mvcResult = mockMvc.perform(requestBuilder)
+                .andExpect(status().isNoContent())
+                .andReturn();
+
+        assertThat(mvcResult.getResponse().getContentAsString()).isEmpty();
+    }
+
+    @Test
+    void getBestTime_whenNoTimesForUserInDatabase_return204HttpCode() throws Exception {
+        var track = Track.WATER_PARK;
+        when(timeService.getBestTimeForTrack(any(Track.class), anyString())).thenReturn(Optional.empty());
+        RequestBuilder requestBuilder = buildGetBestTimeRequest(track, "username");
+
+        MvcResult mvcResult = mockMvc.perform(requestBuilder)
+                .andExpect(status().isNoContent())
+                .andReturn();
+
+        assertThat(mvcResult.getResponse().getContentAsString()).isEmpty();
+    }
+
+    @Test
+    void getBestTime_whenTimesInDatabase_returnTime() throws Exception {
+        var track = Track.WATER_PARK;
+        when(timeService.getBestTimeForTrack(any(Track.class))).thenReturn(Optional.of(createTimeDto(UUID.randomUUID())));
+        RequestBuilder requestBuilder = buildGetBestTimeRequest(track, null);
+
+        MvcResult mvcResult = mockMvc.perform(requestBuilder)
+                .andExpect(status().isOk())
+                .andReturn();
+        TimeDto time = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), TimeDto.class);
+
+        assertThat(time).isNotNull();
+    }
+
+    @Test
+    void getBestTime_whenTimesForUserInDatabase_returnTime() throws Exception {
+        var track = Track.WATER_PARK;
+        when(timeService.getBestTimeForTrack(any(Track.class), anyString())).thenReturn(Optional.of(createTimeDto(UUID.randomUUID())));
+        RequestBuilder requestBuilder = buildGetBestTimeRequest(track, "Username");
+
+        MvcResult mvcResult = mockMvc.perform(requestBuilder)
+                .andExpect(status().isOk())
+                .andReturn();
+        TimeDto time = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), TimeDto.class);
+
+        assertThat(time).isNotNull();
+    }
+
+    private RequestBuilder buildGetBestTimeRequest(Track track, String username) {
+        var requestBuilder = MockMvcRequestBuilders.get(ENDPOINT + "/best/" + track.name());
+
+        if (username != null) {
+            requestBuilder.param("username", username);
+        }
+
+        return requestBuilder;
     }
 }

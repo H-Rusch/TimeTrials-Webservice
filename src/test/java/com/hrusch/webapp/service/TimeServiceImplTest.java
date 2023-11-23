@@ -1,8 +1,11 @@
 package com.hrusch.webapp.service;
 
 import com.hrusch.webapp.exception.UserDoesNotExistException;
-import com.hrusch.webapp.model.TimeEntity;
+import com.hrusch.webapp.exception.UserIdNotFoundException;
+import com.hrusch.webapp.exception.UsernameNotFoundException;
+import com.hrusch.webapp.model.Track;
 import com.hrusch.webapp.model.dto.TimeDto;
+import com.hrusch.webapp.model.entity.TimeEntity;
 import com.hrusch.webapp.repository.TimeRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class TimeServiceImplTest {
@@ -60,10 +63,65 @@ class TimeServiceImplTest {
     @Test
     void saveTime_whenGivenValidTimeRequestButUserNotPresent_throwsException() throws Exception {
         when(userService.findUserByUserId(any(String.class)))
-                .thenThrow(new UserDoesNotExistException(userId.toString()));
+                .thenThrow(new UserIdNotFoundException(userId.toString()));
         var timeDto = createTimeDto(userId);
 
         var exception = assertThrows(UserDoesNotExistException.class, () -> timeService.saveTime(timeDto));
-        assertThat(exception.getMessage()).isEqualTo("User with the userId %s does not exist.", userId.toString());
+        assertThat(exception.getMessage()).isEqualTo("User with the userId '%s' does not exist.", userId.toString());
+    }
+
+    @Test
+    void getBestTimes_whenCalledWithoutUsername_callCorrectMethod() {
+
+        timeService.getBestTimes();
+
+        verify(timeRepository, times(1)).findBestTimeForEachTrack();
+    }
+
+    @Test
+    void getBestTimes_whenGivenUsernameForExistingUser_callCorrectMethod() throws Exception {
+        when(userService.findUserByUsername(any(String.class)))
+                .thenReturn(createEntity(UUID.randomUUID()));
+
+        timeService.getBestTimes("username");
+
+        verify(timeRepository, times(1)).findBestTimeForEachTrack(any(Long.class));
+    }
+
+    @Test
+    void getBestTimes_whenGivenUsernameForNonExistingUser_throwException() throws Exception {
+        when(userService.findUserByUsername(any(String.class)))
+                .thenThrow(new UsernameNotFoundException(""));
+
+        assertThrows(UserDoesNotExistException.class, () -> timeService.getBestTimes("username"));
+    }
+
+    @Test
+    void getBestTimeForTrack_whenCalledWithoutUsername_callCorrectMethod() {
+        var track = Track.WATER_PARK;
+
+        timeService.getBestTimeForTrack(track);
+
+        verify(timeRepository, times(1)).findFirstByTrackOrderByTimeAsc(any(Track.class));
+    }
+
+    @Test
+    void getBestTimeForTrack_whenGivenUsernameForExistingUser_callCorrectMethod() throws Exception {
+        var track = Track.WATER_PARK;
+        when(userService.findUserByUsername(any(String.class)))
+                .thenReturn(createEntity(UUID.randomUUID()));
+
+        timeService.getBestTimeForTrack(track, "username");
+
+        verify(timeRepository, times(1)).findFirstByTrackAndUser_IdOrderByTimeAsc(any(Track.class), any(Long.class));
+    }
+
+    @Test
+    void getBestTimeForTrack_whenGivenUsernameForNonExistingUser_throwException() throws Exception {
+        var track = Track.WATER_PARK;
+        when(userService.findUserByUsername(any(String.class)))
+                .thenThrow(new UsernameNotFoundException(""));
+
+        assertThrows(UserDoesNotExistException.class, () -> timeService.getBestTimeForTrack(track, "username"));
     }
 }
