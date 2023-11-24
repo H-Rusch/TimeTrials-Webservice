@@ -1,13 +1,11 @@
-jdbc:
-  driverClassName: org.h2.Driver
-  url: jdbc:h2:mem:testDb
-
-hibernate:
-  dialect: org.hibernate.dialect.H2Dialect
-  hbm2ddl.auto: create
-
 spring:
   main.banner-mode: off
+
+  datasource:
+    url: jdbc:tc:postgresql:latest:///test
+    username: test
+    password: test
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
 
   jpa:
     show-sql: true
