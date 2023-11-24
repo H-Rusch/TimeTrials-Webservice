@@ -118,16 +118,16 @@ public enum Track {
     static {
         mapping = new HashMap<>();
         Arrays.stream(Track.values()).forEach(track -> {
-            mapping.put(String.valueOf(track), track);
-            mapping.put(track.getName(), track);
+            mapping.put(String.valueOf(track).toLowerCase(), track);
+            mapping.put(track.getName().toLowerCase(), track);
         });
     }
 
     @JsonCreator
     public static Track forValue(String value) throws JsonProcessingException {
-        var track = mapping.get(value);
+        var track = mapping.get(value.toLowerCase());
         if (track == null) {
-            throw new TrackDeserializationException(String.format("Track can not be built from value: %s", value));
+            throw new TrackDeserializationException(String.format("Track can not be built from value '%s'.", value));
         }
 
         return track;

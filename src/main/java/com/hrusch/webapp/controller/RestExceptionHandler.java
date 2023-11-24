@@ -15,6 +15,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 
@@ -47,6 +48,16 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({UsernameAlreadyTakenException.class, UserDoesNotExistException.class})
     public ResponseEntity<Object> handleException(Exception e) {
         return buildResponseEntity(new ApiError(HttpStatus.CONFLICT, e.getMessage()));
+    }
+
+    // https://stackoverflow.com/questions/36190246/handling-exception-in-spring-boot-rest-thrown-from-custom-converter
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Object> handleConverterErrors(MethodArgumentTypeMismatchException exception) {
+        Throwable cause = exception.getCause()
+                .getCause()
+                .getCause();
+
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, cause.getMessage()));
     }
 
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {

@@ -199,6 +199,16 @@ paths:
                 createdAt: '2023-11-20 15:28:15'
         '204':
           description: NO_CONTENT an empty response signalling no best time was found on that track (or for that user if specified).
+        '400':
+          description: BAD_REQUEST the track could not be built from the given string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+              example:
+                status: BAD_REQUEST
+                message: "Track can not be built from value 'INVALID_TRACK'."
+                timestamp: '2023-11-14 12:28:42'
         '409':
           description: CONFLICT the given user does not exist
           content:
