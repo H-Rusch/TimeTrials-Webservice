@@ -1,4 +1,15 @@
-spring.main.banner-mode: off
+spring:
+  main.banner-mode: off
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/hrusch
+    username: hrusch
+    password: postgres
+
+  jpa.properties.hibernate:
+    dialect: org.hibernate.dialect.PostgreSQLDialect
+    ddl-auto: verify
+
 security.ignored: /**
 
 springdoc.swagger-ui.url: /swagger.yaml

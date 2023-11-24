@@ -2,10 +2,10 @@ package com.hrusch.webapp.integration_tests;
 
 import com.hrusch.webapp.TimeUtil;
 import com.hrusch.webapp.UserUtil;
+import com.hrusch.webapp.error.response.ApiError;
 import com.hrusch.webapp.model.Track;
 import com.hrusch.webapp.model.dto.TimeDto;
 import com.hrusch.webapp.model.entity.UserEntity;
-import com.hrusch.webapp.error.response.ApiError;
 import com.hrusch.webapp.repository.TimeRepository;
 import com.hrusch.webapp.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -104,7 +104,7 @@ class ListTimesIntegrationTest {
     }
 
     @Test
-    void getBestTimes_whenRequestingBestTimeOnTrack_returnCorrectTime() {
+    void getBestTime_whenRequestingBestTimeOnTrack_returnCorrectTime() {
         var track = Track.BABY_PARK_GCN;
         var url = baseUrl + "/best/" + track.name();
 
@@ -118,7 +118,7 @@ class ListTimesIntegrationTest {
     }
 
     @Test
-    void getBestTimes_whenRequestingBestTimeOnTrackForUser_returnCorrectTime() {
+    void getBestTime_whenRequestingBestTimeOnTrackForUser_returnCorrectTime() {
         var username = "Username1";
         var track = Track.BABY_PARK_GCN;
         var url = baseUrl + "/best/" + track.name() + "?username=" + username;
@@ -133,7 +133,7 @@ class ListTimesIntegrationTest {
     }
 
     @Test
-    void getBestTimes_whenRequestingBestTimeOnTrackForUserWhoHasNoTimes_returnEmptyResponse() {
+    void getBestTime_whenRequestingBestTimeOnTrackForUserWhoHasNoTimes_returnEmptyResponse() {
         var username = "Username1";
         var url = baseUrl + "/best/WATER_PARK?username=" + username;
 
@@ -144,7 +144,7 @@ class ListTimesIntegrationTest {
     }
 
     @Test
-    void getBestTimes_whenRequestingBestTimeOnTrackForUserWhoDoesNotExist_returnError() {
+    void getBestTime_whenRequestingBestTimeOnTrackForUserWhoDoesNotExist_returnError() {
         var username = "Username2";
         var url = baseUrl + "/best/BABY_PARK_GCN?username=" + username;
 
