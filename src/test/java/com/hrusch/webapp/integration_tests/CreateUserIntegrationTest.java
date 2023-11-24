@@ -2,7 +2,7 @@ package com.hrusch.webapp.integration_tests;
 
 import com.hrusch.webapp.UserUtil;
 import com.hrusch.webapp.model.dto.UserDto;
-import com.hrusch.webapp.model.errorResponse.ApiError;
+import com.hrusch.webapp.error.response.ApiError;
 import com.hrusch.webapp.model.request.UserRequest;
 import com.hrusch.webapp.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;

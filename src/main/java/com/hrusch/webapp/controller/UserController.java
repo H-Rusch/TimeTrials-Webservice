@@ -1,6 +1,6 @@
 package com.hrusch.webapp.controller;
 
-import com.hrusch.webapp.exception.UsernameAlreadyTakenException;
+import com.hrusch.webapp.error.exception.UsernameAlreadyTakenException;
 import com.hrusch.webapp.model.dto.UserDto;
 import com.hrusch.webapp.model.request.UserRequest;
 import com.hrusch.webapp.service.UserService;

@@ -1,8 +1,8 @@
 package com.hrusch.webapp.service;
 
-import com.hrusch.webapp.exception.UserDoesNotExistException;
-import com.hrusch.webapp.exception.UserIdNotFoundException;
-import com.hrusch.webapp.exception.UsernameNotFoundException;
+import com.hrusch.webapp.error.exception.UserDoesNotExistException;
+import com.hrusch.webapp.error.exception.UserIdNotFoundException;
+import com.hrusch.webapp.error.exception.UsernameNotFoundException;
 import com.hrusch.webapp.model.Track;
 import com.hrusch.webapp.model.dto.TimeDto;
 import com.hrusch.webapp.model.entity.TimeEntity;

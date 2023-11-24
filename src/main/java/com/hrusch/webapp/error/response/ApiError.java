@@ -1,4 +1,4 @@
-package com.hrusch.webapp.model.errorResponse;
+package com.hrusch.webapp.error.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;

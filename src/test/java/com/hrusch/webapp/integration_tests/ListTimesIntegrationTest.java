@@ -5,7 +5,7 @@ import com.hrusch.webapp.UserUtil;
 import com.hrusch.webapp.model.Track;
 import com.hrusch.webapp.model.dto.TimeDto;
 import com.hrusch.webapp.model.entity.UserEntity;
-import com.hrusch.webapp.model.errorResponse.ApiError;
+import com.hrusch.webapp.error.response.ApiError;
 import com.hrusch.webapp.repository.TimeRepository;
 import com.hrusch.webapp.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;

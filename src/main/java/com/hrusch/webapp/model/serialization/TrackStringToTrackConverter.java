@@ -1,4 +1,4 @@
-package com.hrusch.webapp.converter;
+package com.hrusch.webapp.model.serialization;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hrusch.webapp.model.Track;

@@ -1,4 +1,4 @@
-package com.hrusch.webapp.exception;
+package com.hrusch.webapp.error.exception;
 
 public class UsernameAlreadyTakenException extends Exception {
 

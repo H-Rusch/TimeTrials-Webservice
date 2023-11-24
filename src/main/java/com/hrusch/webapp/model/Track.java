@@ -3,7 +3,7 @@ package com.hrusch.webapp.model;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.hrusch.webapp.exception.TrackDeserializationException;
+import com.hrusch.webapp.error.exception.TrackDeserializationException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
