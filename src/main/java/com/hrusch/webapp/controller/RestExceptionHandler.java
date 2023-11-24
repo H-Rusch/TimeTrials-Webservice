@@ -1,9 +1,9 @@
 package com.hrusch.webapp.controller;
 
-import com.hrusch.webapp.exception.UserDoesNotExistException;
-import com.hrusch.webapp.exception.UsernameAlreadyTakenException;
-import com.hrusch.webapp.model.errorResponse.ApiError;
-import com.hrusch.webapp.model.errorResponse.ApiValidationError;
+import com.hrusch.webapp.error.exception.UserDoesNotExistException;
+import com.hrusch.webapp.error.exception.UsernameAlreadyTakenException;
+import com.hrusch.webapp.error.response.ApiError;
+import com.hrusch.webapp.error.response.ApiValidationError;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;

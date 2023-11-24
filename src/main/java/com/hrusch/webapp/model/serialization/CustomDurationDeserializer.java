@@ -3,7 +3,7 @@ package com.hrusch.webapp.model.serialization;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.hrusch.webapp.exception.DurationDeserializationException;
+import com.hrusch.webapp.error.exception.DurationDeserializationException;
 
 import java.io.IOException;
 import java.time.Duration;

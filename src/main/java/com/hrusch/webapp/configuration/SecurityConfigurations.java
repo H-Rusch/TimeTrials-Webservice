@@ -1,4 +1,4 @@
-package com.hrusch.webapp.security;
+package com.hrusch.webapp.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
