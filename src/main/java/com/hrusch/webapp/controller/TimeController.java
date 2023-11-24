@@ -55,9 +55,9 @@ public class TimeController {
         List<TimeDto> times = username == null ? timeService.getBestTimes() : timeService.getBestTimes(username);
 
         if (times.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+            return ResponseEntity.noContent().build();
         } else {
-            return ResponseEntity.status(HttpStatus.OK).body(times);
+            return ResponseEntity.ok(times);
         }
     }
 
@@ -72,10 +72,9 @@ public class TimeController {
     ) throws UserDoesNotExistException {
         Optional<TimeDto> time = username == null ? timeService.getBestTimeForTrack(track) : timeService.getBestTimeForTrack(track, username);
 
-        return time.map(timeDto -> ResponseEntity.status(HttpStatus.OK).body(timeDto))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NO_CONTENT).body(null));
+        return time.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
     }
-
 
     TimeDto convertToTimeDto(TimeRequest timeRequest) {
         TimeDto timeDto = modelMapper.map(timeRequest, TimeDto.class);
