@@ -127,7 +127,7 @@ public enum Track {
     public static Track forValue(String value) throws JsonProcessingException {
         var track = mapping.get(value);
         if (track == null) {
-            throw new TrackDeserializationException(String.format("Track can not be built from value: %s", value));
+            throw new TrackDeserializationException(String.format("Track can not be built from value '%s'.", value));
         }
 
         return track;
