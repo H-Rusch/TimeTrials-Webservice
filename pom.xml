@@ -18,7 +18,8 @@
         <java.version>21</java.version>
         <modelmapper.version>3.2.0</modelmapper.version>
         <liquibase.propertyFile>${project.basedir}/liquibase.properties</liquibase.propertyFile>
-        <postgresql.testcontainers.version>1.19.3</postgresql.testcontainers.version>
+        <testcontainers.postgresql.version>1.19.3</testcontainers.postgresql.version>
+        <springdocs.version>2.2.0</springdocs.version>
     </properties>
 
     <dependencies>
@@ -47,16 +48,10 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-
-        <!-- databases -->
         <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-core</artifactId>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${springdocs.version}</version>
         </dependency>
 
         <dependency>
@@ -70,16 +65,22 @@
             <version>${modelmapper.version}</version>
         </dependency>
 
+        <!-- databases -->
         <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.2.0</version>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
         </dependency>
 
+        <!-- test -->
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>postgresql</artifactId>
-            <version>${postgresql.testcontainers.version}</version>
+            <version>${testcontainers.postgresql.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
