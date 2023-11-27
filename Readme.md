@@ -1,8 +1,8 @@
-# Time Trial API
+# Time Trials API
 
-This application is a web-service that provides a REST API and uses JPA to connect to a database.
+This application is a web-service that provides a REST API and uses JPA to connect to a postgres database.
 
-The service's purpose is to save times driven in Mario Kart Time Trials.
+The service's purpose is to save times driven in Mario Kart 8 Deluxe Time Trials.
 
 ## Swagger UI
 This project features a Swagger/ OpenAPI documentation.

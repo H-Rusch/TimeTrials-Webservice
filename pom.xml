@@ -11,8 +11,8 @@
     <groupId>com.hrusch</groupId>
     <artifactId>webapp</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>Web App</name>
-    <description>Web app using Spring Boot</description>
+    <name>Time Trials API</name>
+    <description>API for time trials using Spring Boot</description>
 
     <properties>
         <java.version>21</java.version>
