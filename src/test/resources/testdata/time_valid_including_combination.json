@@ -1,0 +1,12 @@
+{
+  "username" : "name",
+  "track" : "GCN Baby Park",
+  "combination" : {
+    "driver" : "Funky Kong",
+    "vehicle" : "Badwagon",
+    "tires" : "Roller",
+    "glider" : "Flower Glider"
+  },
+  "duration" : "1:07.480",
+  "createdAt" : "2023-05-25 13:37:42"
+}

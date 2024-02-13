@@ -3,7 +3,9 @@ package com.hrusch.webapp.model;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.hrusch.webapp.error.exception.TrackDeserializationException;
+import com.hrusch.webapp.exception.EnumDeserializationException;
+import com.hrusch.webapp.model.combination.Tires;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -125,11 +127,7 @@ public enum Track {
 
     @JsonCreator
     public static Track forValue(String value) throws JsonProcessingException {
-        var track = mapping.get(value.toLowerCase());
-        if (track == null) {
-            throw new TrackDeserializationException(String.format("Track can not be built from value '%s'.", value));
-        }
-
-        return track;
+        return Optional.ofNullable(mapping.get(value.toLowerCase()))
+            .orElseThrow(() -> new EnumDeserializationException(value, Track.class));
     }
 }

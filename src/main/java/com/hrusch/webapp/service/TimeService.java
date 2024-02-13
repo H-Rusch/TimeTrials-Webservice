@@ -1,21 +1,16 @@
 package com.hrusch.webapp.service;
 
-import com.hrusch.webapp.error.exception.UserDoesNotExistException;
+import com.hrusch.webapp.model.Time;
 import com.hrusch.webapp.model.Track;
-import com.hrusch.webapp.model.dto.TimeDto;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface TimeService {
 
-    TimeDto saveTime(TimeDto timeDto) throws UserDoesNotExistException;
+    Time saveTime(Time timeDto);
 
-    List<TimeDto> getBestTimes();
+    List<Time> getBestTimes(String username);
 
-    List<TimeDto> getBestTimes(String username) throws UserDoesNotExistException;
-
-    Optional<TimeDto> getBestTimeForTrack(Track track);
-
-    Optional<TimeDto> getBestTimeForTrack(Track track, String username) throws UserDoesNotExistException;
+    Optional<Time> getBestTimeForTrack(Track track, String username);
 }
