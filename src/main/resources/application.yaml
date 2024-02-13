@@ -1,15 +1,4 @@
 spring:
   main.banner-mode: off
 
-  datasource:
-    url: ${POSTGRES_URL}
-    username: ${POSTGRES_USER}
-    password: ${POSTGRES_PASSWORD}
-
-  jpa.properties.hibernate:
-    dialect: org.hibernate.dialect.PostgreSQLDialect
-    ddl-auto: verify
-
-security.ignored: /**
-
 springdoc.swagger-ui.url: /swagger.yaml

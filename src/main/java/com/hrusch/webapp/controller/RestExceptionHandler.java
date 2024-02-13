@@ -1,9 +1,7 @@
 package com.hrusch.webapp.controller;
 
-import com.hrusch.webapp.error.exception.UserDoesNotExistException;
-import com.hrusch.webapp.error.exception.UsernameAlreadyTakenException;
-import com.hrusch.webapp.error.response.ApiError;
-import com.hrusch.webapp.error.response.ApiValidationError;
+import com.hrusch.webapp.controller.response.ApiError;
+import com.hrusch.webapp.controller.response.ApiValidationError;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -19,7 +17,6 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 
-// https://www.toptal.com/java/spring-boot-rest-api-error-handling
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -43,11 +40,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         Object rejectedValue = error instanceof FieldError fieldError ? fieldError.getRejectedValue() : null;
 
         return new ApiValidationError(field, rejectedValue, error.getDefaultMessage());
-    }
-
-    @ExceptionHandler({UsernameAlreadyTakenException.class, UserDoesNotExistException.class})
-    public ResponseEntity<Object> handleException(Exception e) {
-        return buildResponseEntity(new ApiError(HttpStatus.CONFLICT, e.getMessage()));
     }
 
     // https://stackoverflow.com/questions/36190246/handling-exception-in-spring-boot-rest-thrown-from-custom-converter

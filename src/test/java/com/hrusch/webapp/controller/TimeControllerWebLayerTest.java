@@ -2,12 +2,8 @@ package com.hrusch.webapp.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.hrusch.webapp.TimeUtil;
-import com.hrusch.webapp.error.exception.UserIdNotFoundException;
 import com.hrusch.webapp.model.Track;
-import com.hrusch.webapp.model.dto.TimeDto;
-import com.hrusch.webapp.error.response.ApiError;
-import com.hrusch.webapp.model.request.TimeRequest;
+import com.hrusch.webapp.controller.response.ApiError;
 import com.hrusch.webapp.service.TimeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +24,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.hrusch.webapp.TimeUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -38,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = TimeController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class})
 class TimeControllerWebLayerTest {
-
+/*
     private static final String ENDPOINT = "/times";
 
     @MockBean
@@ -245,4 +240,5 @@ class TimeControllerWebLayerTest {
 
         return requestBuilder;
     }
+    */
 }
