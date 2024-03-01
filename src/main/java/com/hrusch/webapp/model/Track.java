@@ -4,18 +4,17 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hrusch.webapp.exception.EnumDeserializationException;
-import com.hrusch.webapp.model.combination.Tires;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
 @AllArgsConstructor
 @Getter
 public enum Track {
+
     MARIO_KART_STADIUM("Mario Kart Stadium"),
     WATER_PARK("Water Park"),
     SWEET_SWEET_CANYON("Sweet Sweet Canyon"),
@@ -66,7 +65,8 @@ public enum Track {
     BIG_BLUE("Big Blue"),
     PARIS_PROMENADE_TOUR("Tour Paris Promenade"),
     TOAD_CIRCUIT_3DS("3DS Toad Circuit"),
-    CHOCO_MOUNTAIN_N64("N64 Choco Mountain"), WII_COCONUT_MALL("Wii Coconut Mall"),
+    CHOCO_MOUNTAIN_N64("N64 Choco Mountain"),
+    WII_COCONUT_MALL("Wii Coconut Mall"),
     TOKYO_BLUR_TOUR("Tour Tokyo Blur"),
     SHROOM_RIDGE_DS("DS Shroom Ridge"),
     SKY_GARDEN_GBA("GBA Sky Garden"),
