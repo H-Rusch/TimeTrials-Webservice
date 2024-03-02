@@ -2,17 +2,14 @@ package com.hrusch.webapp.repository;
 
 import com.hrusch.webapp.model.Time;
 import com.hrusch.webapp.model.Track;
-import org.springframework.stereotype.Repository;
-
-import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TimeRepository {
 
-    Time save(Time time);
+    Collection<Time> findBestTimeForEachTrack(String username);
 
-    List<Time> findBestTimeForEachTrack(String username);
-
-    Optional<Time> findBestTime(Track track, String username);
+    Optional<Time> findBestTimeForTrack(Track track, String username);
 }
