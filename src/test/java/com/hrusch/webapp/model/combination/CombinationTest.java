@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hrusch.webapp.config.JacksonConfig;
-import com.hrusch.webapp.util.FileReader;
+import com.hrusch.webapp.util.TestDataReader;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -17,66 +17,70 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 class CombinationTest {
 
-    private static final String DIRECTORY = "model";
+  private static final String DIRECTORY = "model";
 
-    private final FileReader fileReader = new FileReader();
-    private final ObjectMapper objectMapper = new JacksonConfig().objectMapper();
+  private final ObjectMapper objectMapper = new JacksonConfig().objectMapper();
 
-    private final Combination subject = new Combination(Driver.FUNKY_KONG, Vehicle.BADWAGON, Tires.CYBER_SLICK, Glider.BOWSER_KITE);
+  private final Combination subject = new Combination(
+      Driver.FUNKY_KONG,
+      Vehicle.BADWAGON,
+      Tires.CYBER_SLICK,
+      Glider.BOWSER_KITE);
 
-    @Test
-    void givenCombinationObject_whenSerializing_produceCorrectJson() throws JsonProcessingException {
-        // given
-        String expected = fileReader.readFileToString(DIRECTORY, "combination_valid.json");
+  @Test
+  void givenCombinationObject_whenSerializing_produceCorrectJson() throws JsonProcessingException {
+    // given
+    String expected = TestDataReader.readFileToString(DIRECTORY, "combination_valid.json");
 
-        // when
-        String json = objectMapper.writeValueAsString(subject);
+    // when
+    String json = objectMapper.writeValueAsString(subject);
 
-        // then
-        assertThat(json).isEqualTo(expected);
+    // then
+    assertThat(json).isEqualTo(expected);
+  }
+
+  @Test
+  void givenValidCombinationJson_whenDeserializing_produceCorrectObject()
+      throws JsonProcessingException {
+    // given
+    String json = TestDataReader.readFileToString(DIRECTORY, "combination_valid.json");
+
+    // when
+    Combination combination = objectMapper.readValue(json, Combination.class);
+
+    // then
+    assertThat(combination).isEqualTo(subject);
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {
+      "combination_invalid_bad_driver.json",
+      "combination_invalid_bad_glider.json",
+      "combination_invalid_bad_tires.json",
+      "combination_invalid_bad_vehicle.json"
+  })
+  void givenInvalidCombinationJson_whenDeserializing_throwException(String file) {
+    // given
+    String json = TestDataReader.readFileToString(DIRECTORY, file);
+
+    // when & then
+    assertThatThrownBy(() -> objectMapper.readValue(json, Combination.class))
+        .isInstanceOf(JsonProcessingException.class);
+  }
+
+  @Test
+  void givenIncompleteCombination_whenValidation_returnValidationErrors() {
+    // given
+    Combination combination = new Combination();
+    Validator validator;
+    try (var validatorFactory = Validation.buildDefaultValidatorFactory()) {
+      validator = validatorFactory.getValidator();
     }
 
-    @Test
-    void givenValidCombinationJson_whenDeserializing_produceCorrectObject() throws JsonProcessingException {
-        // given
-        String json = fileReader.readFileToString(DIRECTORY, "combination_valid.json");
+    // when
+    Set<ConstraintViolation<Combination>> violations = validator.validate(combination);
 
-        // when
-        Combination combination = objectMapper.readValue(json, Combination.class);
-
-        // then
-        assertThat(combination).isEqualTo(subject);
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {
-            "combination_invalid_bad_driver.json",
-            "combination_invalid_bad_glider.json",
-            "combination_invalid_bad_tires.json",
-            "combination_invalid_bad_vehicle.json"
-    })
-    void givenInvalidCombinationJson_whenDeserializing_throwException(String file) {
-        // given
-        String json = fileReader.readFileToString(DIRECTORY, file);
-
-        // when & then
-        assertThatThrownBy(() -> objectMapper.readValue(json, Combination.class))
-                .isInstanceOf(JsonProcessingException.class);
-    }
-
-    @Test
-    void givenIncompleteCombination_whenValidation_returnValidationErrors() {
-        // given
-        Combination combination = new Combination();
-        Validator validator;
-        try (var validatorFactory = Validation.buildDefaultValidatorFactory()) {
-            validator = validatorFactory.getValidator();
-        }
-
-        // when
-        Set<ConstraintViolation<Combination>> violations = validator.validate(combination);
-
-        // then
-        assertThat(violations).hasSize(4);
-    }
+    // then
+    assertThat(violations).hasSize(4);
+  }
 }

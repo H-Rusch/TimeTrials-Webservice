@@ -7,13 +7,13 @@ import java.nio.file.Path;
 import java.util.Objects;
 import lombok.SneakyThrows;
 
-public class FileReader {
+public class TestDataReader {
 
   private static final String TESTDATA_ROOT = "testdata";
 
   @SneakyThrows
-  public String readFileToString(String folder, String filepath) {
-    URL url = getClass().getResource(
+  public static String readFileToString(String folder, String filepath) {
+    URL url = TestDataReader.class.getResource(
         String.join("/", "", TESTDATA_ROOT, folder, filepath));
 
     if (Objects.isNull(url)) {
