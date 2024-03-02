@@ -2,23 +2,67 @@ package com.hrusch.webapp.repository;
 
 import com.hrusch.webapp.model.Time;
 import com.hrusch.webapp.model.Track;
-import java.util.List;
+import com.hrusch.webapp.util.CriteriaUtil;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Objects;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.LimitOperation;
+import org.springframework.data.mongodb.core.aggregation.MatchOperation;
+import org.springframework.data.mongodb.core.aggregation.SortOperation;
+import org.springframework.data.mongodb.core.query.Criteria;
 
+@Slf4j
+@AllArgsConstructor
 public class TimeRepositoryImpl implements TimeRepository {
 
+  private static final String COLLECTION = "times";
+
+  private static final String USERNAME = "username";
+  private static final String TRACK = "track";
+
+  private MongoTemplate mongoTemplate;
+
   @Override
-  public Time save(Time time) {
-    return null;
+  public Collection<Time> findBestTimeForEachTrack(String username) {
+    return Collections.emptyList();
   }
 
   @Override
-  public List<Time> findBestTimeForEachTrack(String username) {
-    return null;
+  public Optional<Time> findBestTimeForTrack(Track track, String username) {
+    if (Objects.isNull(track)) {
+      log.error("Track can not be null when searching best time for track.");
+      return Optional.empty();
+    }
+
+    Criteria trackCriteria = Criteria.where(TRACK).is(track);
+    Optional<Criteria> userCriteria = CriteriaUtil.buildForValue(USERNAME, username);
+
+    Criteria combinedCriteria = userCriteria
+        .map(it -> new Criteria().andOperator(trackCriteria, it))
+        .orElse(trackCriteria);
+
+    return findBestTimeByCriteria(combinedCriteria);
   }
 
-  @Override
-  public Optional<Time> findBestTime(Track track, String username) {
-    return Optional.empty();
+  private Optional<Time> findBestTimeByCriteria(Criteria criteria) {
+    MatchOperation matchOperation = Aggregation.match(criteria);
+    SortOperation sortOperation = Aggregation.sort(Sort.by(Direction.ASC, "duration"));
+    LimitOperation limitOperation = Aggregation.limit(1);
+    Aggregation aggregation = Aggregation.newAggregation(
+        matchOperation,
+        sortOperation,
+        limitOperation);
+
+    return mongoTemplate.aggregate(aggregation, COLLECTION, Time.class)
+        .getMappedResults()
+        .stream()
+        .findFirst();
   }
 }
