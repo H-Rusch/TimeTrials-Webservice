@@ -21,6 +21,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 class TimeTest {
 
+  private static final String DIRECTORY = "model";
+
   private final FileReader fileReader = new FileReader();
   private final ObjectMapper objectMapper = new JacksonConfig().objectMapper();
 
@@ -50,31 +52,41 @@ class TimeTest {
   @Test
   void givenTimeObjectWithCombination_whenSerializing_createJsonWithCombination()
       throws JsonProcessingException {
-    String expected = fileReader.readFileToString("time_valid_including_combination.json");
+    // given
+    String expected = fileReader.readFileToString(DIRECTORY, "time_valid_including_combination.json");
 
+    // when
     String json = objectMapper.writeValueAsString(subject);
 
+    // then
     assertThat(json).isEqualTo(expected);
   }
 
   @Test
   void givenTimeObjectWithoutCombination_whenSerializing_createJsonWithoutCombination()
           throws JsonProcessingException {
-    String expected = fileReader.readFileToString("time_valid_missing_combination.json");
+    // given
+    String expected = fileReader.readFileToString(DIRECTORY, "time_valid_missing_combination.json");
     subject.setCombination(null);
 
+    // when
     String json = objectMapper.writeValueAsString(subject);
 
+    // then
     assertThat(json).isEqualTo(expected);
   }
 
   @Test
   void givenValidTimeJson_whenDeserializing_thenCorrectObjectCreated()
       throws JsonProcessingException {
-    var json = fileReader.readFileToString("time_valid_missing_combination.json");
+    // given
+    String json = fileReader.readFileToString(DIRECTORY, "time_valid_missing_combination.json");
 
+    // when
     Time time = objectMapper.readValue(json, Time.class);
 
+    // then
+    // TODO refactor with extracting
     assertThat(time.getUsername()).isEqualTo("name");
     assertThat(time.getTrack()).isEqualTo(Track.BABY_PARK_GCN);
     assertThat(time.getDuration()).isEqualTo(duration);
@@ -84,10 +96,11 @@ class TimeTest {
   @ParameterizedTest
   @ValueSource(
       strings = {"time_invalid_default_duration.json", "time_invalid_default_timestamp.json"})
-  void givenInvalidTimeJson_whenDeserializing_thenExceptionIsThrown(String filename)
-      throws JsonProcessingException {
-    var json = fileReader.readFileToString(filename);
+  void givenInvalidTimeJson_whenDeserializing_thenExceptionIsThrown(String filename) {
+    // given
+    String json = fileReader.readFileToString(DIRECTORY, filename);
 
+    // when & then
     assertThatThrownBy(() -> objectMapper.readValue(json, Time.class))
         .isInstanceOf(JsonProcessingException.class);
   }
