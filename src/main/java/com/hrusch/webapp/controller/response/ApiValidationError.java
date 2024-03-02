@@ -9,13 +9,13 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiValidationError implements ApiSubError {
 
-    private String field;
-    private Object rejectedValue;
-    private String message;
+  private String field;
+  private Object rejectedValue;
+  private String message;
 
-    public ApiValidationError(String field, Object rejectedValue, String message) {
-        this.field = field;
-        this.rejectedValue = rejectedValue;
-        this.message = message;
-    }
+  public ApiValidationError(String field, Object rejectedValue, String message) {
+    this.field = field;
+    this.rejectedValue = rejectedValue;
+    this.message = message;
+  }
 }
