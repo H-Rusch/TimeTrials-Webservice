@@ -17,6 +17,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 class CombinationTest {
 
+    private static final String DIRECTORY = "model";
+
     private final FileReader fileReader = new FileReader();
     private final ObjectMapper objectMapper = new JacksonConfig().objectMapper();
 
@@ -24,19 +26,25 @@ class CombinationTest {
 
     @Test
     void givenCombinationObject_whenSerializing_produceCorrectJson() throws JsonProcessingException {
-        String expected = fileReader.readFileToString("combination_valid.json");
+        // given
+        String expected = fileReader.readFileToString(DIRECTORY, "combination_valid.json");
 
+        // when
         String json = objectMapper.writeValueAsString(subject);
 
+        // then
         assertThat(json).isEqualTo(expected);
     }
 
     @Test
     void givenValidCombinationJson_whenDeserializing_produceCorrectObject() throws JsonProcessingException {
-        String json = fileReader.readFileToString("combination_valid.json");
+        // given
+        String json = fileReader.readFileToString(DIRECTORY, "combination_valid.json");
 
+        // when
         Combination combination = objectMapper.readValue(json, Combination.class);
 
+        // then
         assertThat(combination).isEqualTo(subject);
     }
 
@@ -48,22 +56,27 @@ class CombinationTest {
             "combination_invalid_bad_vehicle.json"
     })
     void givenInvalidCombinationJson_whenDeserializing_throwException(String file) {
-        String json = fileReader.readFileToString(file);
+        // given
+        String json = fileReader.readFileToString(DIRECTORY, file);
 
+        // when & then
         assertThatThrownBy(() -> objectMapper.readValue(json, Combination.class))
                 .isInstanceOf(JsonProcessingException.class);
     }
 
     @Test
     void givenIncompleteCombination_whenValidation_returnValidationErrors() {
-        var combination = new Combination();
+        // given
+        Combination combination = new Combination();
         Validator validator;
         try (var validatorFactory = Validation.buildDefaultValidatorFactory()) {
             validator = validatorFactory.getValidator();
         }
 
+        // when
         Set<ConstraintViolation<Combination>> violations = validator.validate(combination);
 
+        // then
         assertThat(violations).hasSize(4);
     }
 }
