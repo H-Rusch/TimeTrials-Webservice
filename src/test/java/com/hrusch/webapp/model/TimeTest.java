@@ -11,7 +11,7 @@ import com.hrusch.webapp.model.combination.Driver;
 import com.hrusch.webapp.model.combination.Glider;
 import com.hrusch.webapp.model.combination.Tires;
 import com.hrusch.webapp.model.combination.Vehicle;
-import com.hrusch.webapp.util.FileReader;
+import com.hrusch.webapp.util.TestDataReader;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +23,6 @@ class TimeTest {
 
   private static final String DIRECTORY = "model";
 
-  private final FileReader fileReader = new FileReader();
   private final ObjectMapper objectMapper = new JacksonConfig().objectMapper();
 
   private final LocalDateTime timestamp = LocalDateTime.of(2023, 5, 25, 13, 37, 42);
@@ -53,7 +52,8 @@ class TimeTest {
   void givenTimeObjectWithCombination_whenSerializing_createJsonWithCombination()
       throws JsonProcessingException {
     // given
-    String expected = fileReader.readFileToString(DIRECTORY, "time_valid_including_combination.json");
+    String expected = TestDataReader.readFileToString(DIRECTORY,
+        "time_valid_including_combination.json");
 
     // when
     String json = objectMapper.writeValueAsString(subject);
@@ -64,9 +64,10 @@ class TimeTest {
 
   @Test
   void givenTimeObjectWithoutCombination_whenSerializing_createJsonWithoutCombination()
-          throws JsonProcessingException {
+      throws JsonProcessingException {
     // given
-    String expected = fileReader.readFileToString(DIRECTORY, "time_valid_missing_combination.json");
+    String expected = TestDataReader.readFileToString(DIRECTORY,
+        "time_valid_missing_combination.json");
     subject.setCombination(null);
 
     // when
@@ -80,7 +81,7 @@ class TimeTest {
   void givenValidTimeJson_whenDeserializing_thenCorrectObjectCreated()
       throws JsonProcessingException {
     // given
-    String json = fileReader.readFileToString(DIRECTORY, "time_valid_missing_combination.json");
+    String json = TestDataReader.readFileToString(DIRECTORY, "time_valid_missing_combination.json");
 
     // when
     Time time = objectMapper.readValue(json, Time.class);
@@ -98,7 +99,7 @@ class TimeTest {
       strings = {"time_invalid_default_duration.json", "time_invalid_default_timestamp.json"})
   void givenInvalidTimeJson_whenDeserializing_thenExceptionIsThrown(String filename) {
     // given
-    String json = fileReader.readFileToString(DIRECTORY, filename);
+    String json = TestDataReader.readFileToString(DIRECTORY, filename);
 
     // when & then
     assertThatThrownBy(() -> objectMapper.readValue(json, Time.class))
