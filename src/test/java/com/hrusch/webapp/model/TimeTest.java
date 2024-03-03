@@ -27,25 +27,24 @@ class TimeTest {
 
   private final LocalDateTime timestamp = LocalDateTime.of(2023, 5, 25, 13, 37, 42);
   private final Duration duration = Duration.parse("PT1M7.48S");
+  private final Combination combination = Combination.builder()
+      .driver(Driver.FUNKY_KONG)
+      .vehicle(Vehicle.BADWAGON)
+      .tires(Tires.ROLLER)
+      .glider(Glider.FLOWER_GLIDER)
+      .build();
 
   private Time subject;
 
   @BeforeEach
   void setUp() {
-    subject =
-        Time.builder()
-            .username("name")
-            .duration(duration)
-            .track(Track.BABY_PARK_GCN)
-            .createdAt(timestamp)
-            .combination(
-                Combination.builder()
-                    .driver(Driver.FUNKY_KONG)
-                    .vehicle(Vehicle.BADWAGON)
-                    .tires(Tires.ROLLER)
-                    .glider(Glider.FLOWER_GLIDER)
-                    .build())
-            .build();
+    subject = Time.builder()
+        .username("name")
+        .duration(duration)
+        .track(Track.BABY_PARK_GCN)
+        .createdAt(timestamp)
+        .combination(combination)
+        .build();
   }
 
   @Test
@@ -74,11 +73,12 @@ class TimeTest {
     String json = objectMapper.writeValueAsString(subject);
 
     // then
-    assertThat(json).isEqualTo(expected);
+    assertThat(json)
+        .isEqualTo(expected);
   }
 
   @Test
-  void givenValidTimeJson_whenDeserializing_thenCorrectObjectCreated()
+  void givenValidTimeJsonWithoutCombination_whenDeserializing_thenCorrectObjectCreated()
       throws JsonProcessingException {
     // given
     String json = TestDataReader.readFileToString(DIRECTORY, "time_valid_missing_combination.json");
@@ -87,11 +87,43 @@ class TimeTest {
     Time time = objectMapper.readValue(json, Time.class);
 
     // then
-    // TODO refactor with extracting
-    assertThat(time.getUsername()).isEqualTo("name");
-    assertThat(time.getTrack()).isEqualTo(Track.BABY_PARK_GCN);
-    assertThat(time.getDuration()).isEqualTo(duration);
-    assertThat(time.getCreatedAt()).isEqualTo(timestamp);
+    assertThat(time)
+        .extracting(
+            Time::getUsername,
+            Time::getTrack,
+            Time::getDuration,
+            Time::getCreatedAt)
+        .containsExactly(
+            "name",
+            Track.BABY_PARK_GCN,
+            duration,
+            timestamp);
+  }
+
+  @Test
+  void givenValidTimeJsonWithCombination_whenDeserializing_thenCorrectObjectCreated()
+      throws JsonProcessingException {
+    // given
+    String json = TestDataReader.readFileToString(DIRECTORY,
+        "time_valid_including_combination.json");
+
+    // when
+    Time time = objectMapper.readValue(json, Time.class);
+
+    // then
+    assertThat(time)
+        .extracting(
+            Time::getUsername,
+            Time::getTrack,
+            Time::getDuration,
+            Time::getCreatedAt,
+            Time::getCombination)
+        .containsExactly(
+            "name",
+            Track.BABY_PARK_GCN,
+            duration,
+            timestamp,
+            combination);
   }
 
   @ParameterizedTest
