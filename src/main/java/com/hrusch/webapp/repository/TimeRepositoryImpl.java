@@ -4,7 +4,7 @@ import com.hrusch.webapp.model.Time;
 import com.hrusch.webapp.model.Track;
 import com.hrusch.webapp.util.CriteriaUtil;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -13,8 +13,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.GroupOperation;
 import org.springframework.data.mongodb.core.aggregation.LimitOperation;
 import org.springframework.data.mongodb.core.aggregation.MatchOperation;
+import org.springframework.data.mongodb.core.aggregation.ReplaceRootOperation;
 import org.springframework.data.mongodb.core.aggregation.SortOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 
@@ -31,7 +33,27 @@ public class TimeRepositoryImpl implements TimeRepository {
 
   @Override
   public Collection<Time> findBestTimeForEachTrack(String username) {
-    return Collections.emptyList();
+    Criteria criteria = CriteriaUtil.buildForValue(USERNAME, username)
+        .orElse(new Criteria());
+
+    return findBestTimeForEachTrackBasedOnCriteria(criteria);
+  }
+
+  private List<Time> findBestTimeForEachTrackBasedOnCriteria(Criteria criteria) {
+    MatchOperation matchOperation = Aggregation.match(criteria);
+    SortOperation sortOperation = Aggregation.sort(Sort.by(Direction.ASC, "duration"));
+    GroupOperation groupOperation = Aggregation.group(TRACK)
+        .first("$$ROOT").as("document");
+    ReplaceRootOperation replaceRootOperation = Aggregation.replaceRoot("document");
+
+    Aggregation aggregation = Aggregation.newAggregation(
+        matchOperation,
+        sortOperation,
+        groupOperation,
+        replaceRootOperation);
+
+    return mongoTemplate.aggregate(aggregation, COLLECTION, Time.class)
+        .getMappedResults();
   }
 
   @Override
