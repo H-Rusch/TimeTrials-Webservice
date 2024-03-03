@@ -4,13 +4,16 @@ package com.hrusch.webapp.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hrusch.webapp.config.MongoConfig;
 import com.hrusch.webapp.model.Time;
 import com.hrusch.webapp.model.Track;
 import com.hrusch.webapp.util.MongoDBTestContainerConfig;
 import com.hrusch.webapp.util.TestDataReader;
 import java.time.Duration;
+import java.util.Collection;
 import java.util.Optional;
 import lombok.SneakyThrows;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -18,12 +21,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @DataMongoTest
 @ExtendWith(SpringExtension.class)
+@Import(MongoConfig.class)
 class TimeRepositoryImplIT extends MongoDBTestContainerConfig {
 
   private static final String COLLECTION = "times";
@@ -116,6 +121,49 @@ class TimeRepositoryImplIT extends MongoDBTestContainerConfig {
               username,
               track,
               expectedDuration);
+    }
+  }
+
+  @Nested
+  class TimeRepositoryImplFindBestTimeForEachTrackTest {
+
+    @Test
+    void givenNoParameters_whenFindBestTimeForEachTrack_thenReturnedListContainsOnlyTheBestTimes() {
+      // given & when
+      Collection<Time> result = subject.findBestTimeForEachTrack(null);
+
+      // then
+      assertThat(result)
+          .extracting(
+              Time::getUsername,
+              Time::getTrack,
+              Time::getDuration)
+          .containsExactlyInAnyOrder(
+              Tuple.tuple("name2", Track.BABY_PARK_GCN, Duration.parse("PT1M1.48S")),
+              Tuple.tuple("name1", Track.MARIO_CIRCUIT, Duration.parse("PT1M34.123S")));
+    }
+
+    @Test
+    void givenUsername_whenFindBestTimeForEachTrack_thenReturnedListContainsOnlyTheBestTimesForThatUser() {
+      // given
+      String username = "name1";
+
+      // when
+      Collection<Time> result = subject.findBestTimeForEachTrack(username);
+      System.out.println(result);
+
+      // then
+      assertThat(result)
+          .hasSize(2)
+          .allMatch(time -> time.getUsername().equals(username));
+      assertThat(result)
+          .extracting(
+              Time::getUsername,
+              Time::getTrack,
+              Time::getDuration)
+          .containsExactlyInAnyOrder(
+              Tuple.tuple(username, Track.BABY_PARK_GCN, Duration.parse("PT1M7.48S")),
+              Tuple.tuple(username, Track.MARIO_CIRCUIT, Duration.parse("PT1M34.123S")));
     }
   }
 }
