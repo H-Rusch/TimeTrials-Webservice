@@ -1,114 +1,75 @@
 package com.hrusch.webapp.service;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.verify;
+
+import com.hrusch.webapp.exception.ParameterErrorException;
 import com.hrusch.webapp.model.Track;
 import com.hrusch.webapp.repository.TimeRepository;
-import org.junit.jupiter.api.Test;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
-
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class TimeServiceImplTest {
 
-    @Mock
-    TimeRepository timeRepository;
+  @Mock
+  TimeRepository timeRepository;
 
-    @InjectMocks
-    TimeServiceImpl timeService;
+  @InjectMocks
+  TimeServiceImpl subject;
 
-    @Test
-    void saveTime_whenGivenValidTimeRequestAndUserPresent_createAndReturnTimeObject() throws Exception {
-/*        var userEntity = createEntity(userId);
-        var timeEntity = createTimeEntity(userEntity);
-        when(modelMapper.map(any(TimeDto.class), eq(TimeEntity.class)))
-                .thenReturn(timeEntity);
-        when(userService.findUserByUserId(any(String.class))).thenReturn(userEntity);
-        when(timeRepository.save(any(TimeEntity.class))).thenReturn(timeEntity);
-        when(modelMapper.map(any(TimeEntity.class), eq(TimeDto.class)))
-                .thenReturn(new ModelMapper().map(timeEntity, TimeDto.class));
-        var timeDto = createTimeDto(userId);
+  @Nested
+  class TimeServiceImplGetBestTimeForEachTrackTest {
 
-        var resultingTimeDto = timeService.saveTime(timeDto);
+    @ParameterizedTest
+    @MethodSource("usernameParameterVariations")
+    void givenUsername_whenGetBestTimeForEachTrack_thenRepositoryMethodCalled(String username) {
+      // given & when
+      subject.getBestTimeForEachTrack(username);
 
-        assertThat(resultingTimeDto.getTime()).isEqualTo(timeDto.getTime());
-        assertThat(resultingTimeDto.getUserId()).isEqualTo(timeDto.getUserId());
-        assertThat(resultingTimeDto.getCreatedAt()).isEqualTo(timeDto.getCreatedAt());
-        assertThat(resultingTimeDto.getUsername()).isNotNull();*/
+      // then
+      verify(timeRepository).findBestTimeForEachTrack(username);
     }
 
-    @Test
-    void saveTime_whenGivenValidTimeRequestButUserNotPresent_throwsException() throws Exception {
-       /* when(userService.findUserByUserId(any(String.class)))
-                .thenThrow(new UserIdNotFoundException(userId.toString()));
-        var timeDto = createTimeDto(userId);
+    private static Stream<String> usernameParameterVariations() {
+      return Stream.of(null, "", "username");
+    }
+  }
 
-        var exception = assertThrows(UserDoesNotExistException.class, () -> timeService.saveTime(timeDto));
-        assertThat(exception.getMessage())
-        .isEqualTo("User with the userId '%s' does not exist.", userId.toString());*/
+  @Nested
+  class TimeServiceImplGetBestTimeForTrackTest {
+
+    @ParameterizedTest
+    @MethodSource("usernameParameterVariations")
+    void givenValidParameters_whenGetBestTimeForTrack_thenRepositoryMethodCalled(String username) {
+      // given
+      Track track = Track.BABY_PARK_GCN;
+
+      // when
+      subject.getBestTimeForTrack(track, username);
+
+      // then
+      verify(timeRepository).findBestTimeForTrack(track, username);
     }
 
-    @Test
-    void getBestTimes_whenCalledWithoutUsername_callCorrectMethod() {
 
-        /*timeService.getBestTimes();
-
-        verify(timeRepository, times(1)).findBestTimeForEachTrack();*/
+    @ParameterizedTest
+    @MethodSource("usernameParameterVariations")
+    void givenNullAsTrack_whenGetBestTimeForTrack_thenException(String username) {
+      // given, when & then
+      assertThatThrownBy(() -> subject.getBestTimeForTrack(null, username))
+          .isInstanceOf(ParameterErrorException.class)
+          .hasMessage("The required parameter 'track' contains an error.");
     }
 
-    @Test
-    void getBestTimes_whenGivenUsernameForExistingUser_callCorrectMethod() throws Exception {
-        /*when(userService.findUserByUsername(any(String.class)))
-                .thenReturn(createEntity(UUID.randomUUID()));
-
-        timeService.getBestTimes("username");
-
-        verify(timeRepository, times(1)).findBestTimeForEachTrack(any(Long.class));*/
+    private static Stream<String> usernameParameterVariations() {
+      return Stream.of(null, "", "username");
     }
-/*
-    @Test
-    void getBestTimes_whenGivenUsernameForNonExistingUser_throwException() throws Exception {
-        when(userService.findUserByUsername(any(String.class)))
-                .thenThrow(new UsernameNotFoundException(""));
-
-        assertThrows(UserDoesNotExistException.class, () -> timeService.getBestTimes("username"));
-    }
-
-    @Test
-    void getBestTimeForTrack_whenCalledWithoutUsername_callCorrectMethod() {
-        var track = Track.WATER_PARK;
-
-        timeService.getBestTimeForTrack(track);
-
-        verify(timeRepository, times(1)).findFirstByTrackOrderByTimeAsc(any(Track.class));
-    }
-
-    @Test
-    void getBestTimeForTrack_whenGivenUsernameForExistingUser_callCorrectMethod() throws Exception {
-        var track = Track.WATER_PARK;
-        when(userService.findUserByUsername(any(String.class)))
-                .thenReturn(createEntity(UUID.randomUUID()));
-
-        timeService.getBestTimeForTrack(track, "username");
-
-        verify(timeRepository, times(1)).findFirstByTrackAndUser_IdOrderByTimeAsc(any(Track.class), any(Long.class));
-    }
-
-    @Test
-    void getBestTimeForTrack_whenGivenUsernameForNonExistingUser_throwException() throws Exception {
-        var track = Track.WATER_PARK;
-        when(userService.findUserByUsername(any(String.class)))
-                .thenThrow(new UsernameNotFoundException(""));
-
-        assertThrows(UserDoesNotExistException.class, () -> timeService.getBestTimeForTrack(track, "username"));
-    }*/
+  }
 }
