@@ -3,22 +3,18 @@ services:
   webapp:
     build: .
     environment:
-      POSTGRES_URL: jdbc:postgresql://database:5432/time-trials
-      POSTGRES_USER: hrusch
-      POSTGRES_PASSWORD: postgres
+      MONGODB_URL: mongodb://database:27017/time-trials
     ports:
       - "8080:8080"
     depends_on:
       - "database"
 
   database:
-    image: postgres
-    environment:
-      POSTGRES_USER: hrusch
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: time-trials
+    image: "mongo:latest"
+    ports:
+      - "27017:27017"
     volumes:
-      - time-trials-volume:/var/lib/postgresql/data
+      - time-trials-volume:/data/db
 
 volumes:
   time-trials-volume:
