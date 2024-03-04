@@ -2,6 +2,7 @@ package com.hrusch.webapp.controller;
 
 import com.hrusch.webapp.controller.response.ApiError;
 import com.hrusch.webapp.controller.response.ApiValidationError;
+import com.hrusch.webapp.exception.ParameterErrorException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -50,6 +51,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         error instanceof FieldError fieldError ? fieldError.getRejectedValue() : null;
 
     return new ApiValidationError(field, rejectedValue, error.getDefaultMessage());
+  }
+
+  @ExceptionHandler(ParameterErrorException.class)
+  public ResponseEntity<Object> handleParameterErrorException(ParameterErrorException exception) {
+    return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage()));
   }
 
   // https://stackoverflow.com/questions/36190246/handling-exception-in-spring-boot-rest-thrown-from-custom-converter
