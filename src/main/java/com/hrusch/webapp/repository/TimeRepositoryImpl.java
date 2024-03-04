@@ -19,9 +19,11 @@ import org.springframework.data.mongodb.core.aggregation.MatchOperation;
 import org.springframework.data.mongodb.core.aggregation.ReplaceRootOperation;
 import org.springframework.data.mongodb.core.aggregation.SortOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.stereotype.Repository;
 
 @Slf4j
 @AllArgsConstructor
+@Repository
 public class TimeRepositoryImpl implements TimeRepository {
 
   private static final String COLLECTION = "times";
