@@ -17,12 +17,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -31,8 +33,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-@WebMvcTest(controllers = TimeController.class, excludeAutoConfiguration = {
-    SecurityAutoConfiguration.class})
+@WebMvcTest(controllers = TimeController.class)
 class TimeControllerWebLayerTest {
 
   private static final String ENDPOINT = "/times";
@@ -256,6 +257,40 @@ class TimeControllerWebLayerTest {
           .contentType(MediaType.APPLICATION_JSON)
           .content(json);
     }
+
+    @ParameterizedTest
+    @MethodSource("invalidTimeDtoObjects")
+    void givenInvalidTimeDto_whenSavingToDatabase_then400Returned() throws Exception {
+      // given
+      RequestBuilder requestBuilder = buildPostNewTimeRequest();
+
+      // when & then
+      MvcResult mvcResult = mockMvc.perform(requestBuilder)
+          .andExpect(status().isCreated())
+          .andReturn();
+      assertThat(mvcResult.getResponse().getContentAsString())
+          .isEmpty();
+    }
+
+    private static Stream<TimeDto> invalidTimeDtoObjects() {
+      TimeDto usernameTooShort = createSampleTimeDto();
+      usernameTooShort.setUsername("a");
+
+      TimeDto usernameTooLong = createSampleTimeDto();
+      usernameTooLong.setUsername("a".repeat(33));
+
+      TimeDto usernameNull = createSampleTimeDto();
+      usernameNull.setUsername(null);
+
+      TimeDto durationNull = createSampleTimeDto();
+      durationNull.setDuration(null);
+
+      return Stream.of(
+          usernameTooShort,
+          usernameTooLong,
+          usernameNull,
+          durationNull);
+    }
   }
 
   private Time createSampleTime() {
@@ -266,7 +301,7 @@ class TimeControllerWebLayerTest {
         .build();
   }
 
-  private TimeDto createSampleTimeDto() {
+  private static TimeDto createSampleTimeDto() {
     return TimeDto.builder()
         .username("username")
         .track(Track.BABY_PARK_GCN)

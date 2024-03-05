@@ -4,6 +4,7 @@ import com.hrusch.webapp.model.Time;
 import com.hrusch.webapp.model.TimeDto;
 import com.hrusch.webapp.model.Track;
 import com.hrusch.webapp.service.TimeService;
+import jakarta.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -62,7 +63,7 @@ public class TimeController {
    * successfully.
    */
   @PostMapping
-  public ResponseEntity<Void> saveNewTime(@RequestBody TimeDto timeDto) {
+  public ResponseEntity<Void> saveNewTime(@RequestBody @Valid TimeDto timeDto) {
     timeService.saveNewTime(timeDto);
 
     return ResponseEntity.status(HttpStatus.CREATED).build();

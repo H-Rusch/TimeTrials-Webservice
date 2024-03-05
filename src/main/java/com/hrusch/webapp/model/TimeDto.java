@@ -1,13 +1,12 @@
 package com.hrusch.webapp.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.hrusch.webapp.model.combination.Combination;
 import com.hrusch.webapp.model.serialization.CustomDurationDeserializer;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +16,8 @@ import lombok.Data;
 @AllArgsConstructor
 public class TimeDto {
 
+  @NotNull
+  @Size(min = 3, max = 32)
   private String username;
 
   private Track track;
@@ -24,10 +25,7 @@ public class TimeDto {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Combination combination;
 
+  @NotNull
   @JsonDeserialize(using = CustomDurationDeserializer.class)
   private Duration duration;
-
-  @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-  private LocalDateTime createdAt;
 }
