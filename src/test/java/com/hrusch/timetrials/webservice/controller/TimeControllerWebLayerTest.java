@@ -8,11 +8,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hrusch.timetrials.webservice.config.JacksonConfig;
+import com.hrusch.timetrials.webservice.controller.response.ApiError;
 import com.hrusch.timetrials.webservice.model.Time;
 import com.hrusch.timetrials.webservice.model.TimeDto;
-import com.hrusch.timetrials.webservice.service.TimeService;
-import com.hrusch.timetrials.webservice.controller.response.ApiError;
 import com.hrusch.timetrials.webservice.model.Track;
+import com.hrusch.timetrials.webservice.service.TimeService;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
@@ -28,6 +28,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -36,6 +37,7 @@ import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @WebMvcTest(controllers = TimeController.class)
+@Import(JacksonConfig.class)
 class TimeControllerWebLayerTest {
 
   private static final String ENDPOINT = "/times";
@@ -252,7 +254,8 @@ class TimeControllerWebLayerTest {
 
     @ParameterizedTest
     @MethodSource("invalidTimeDtoObjects")
-    void givenInvalidTimeDto_whenSavingToDatabase_then400Returned(TimeDto timeDto) throws Exception {
+    void givenInvalidTimeDto_whenSavingToDatabase_then400Returned(TimeDto timeDto)
+        throws Exception {
       // given
       RequestBuilder requestBuilder = buildPostNewTimeRequest(timeDto);
 

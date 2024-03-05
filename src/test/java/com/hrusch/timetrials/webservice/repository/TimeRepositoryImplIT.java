@@ -4,6 +4,7 @@ package com.hrusch.timetrials.webservice.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hrusch.timetrials.webservice.config.JacksonConfig;
 import com.hrusch.timetrials.webservice.config.MongoConfig;
 import com.hrusch.timetrials.webservice.model.Time;
 import com.hrusch.timetrials.webservice.util.MongoDBTestContainerConfig;
@@ -30,7 +31,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @DataMongoTest
 @ExtendWith(SpringExtension.class)
-@Import(MongoConfig.class)
+@Import({MongoConfig.class, JacksonConfig.class})
 class TimeRepositoryImplIT extends MongoDBTestContainerConfig {
 
   private static final String COLLECTION = "times";
@@ -53,7 +54,7 @@ class TimeRepositoryImplIT extends MongoDBTestContainerConfig {
 
   @SneakyThrows
   private static Time convertJsonToTime(String json) {
-    return new ObjectMapper().readValue(json, Time.class);
+    return new JacksonConfig().objectMapper().readValue(json, Time.class);
   }
 
   @AfterEach
