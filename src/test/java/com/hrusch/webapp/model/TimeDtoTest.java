@@ -8,7 +8,6 @@ import com.hrusch.webapp.model.combination.Glider;
 import com.hrusch.webapp.model.combination.Tires;
 import com.hrusch.webapp.model.combination.Vehicle;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
@@ -44,7 +43,7 @@ class TimeDtoTest {
             timeDto.getUsername(),
             timeDto.getTrack(),
             timeDto.getDuration(),
-            timeDto.getCreatedAt(),
+            null,
             timeDto.getCombination());
   }
 
@@ -71,7 +70,7 @@ class TimeDtoTest {
             timeDto.getUsername(),
             timeDto.getTrack(),
             timeDto.getDuration(),
-            timeDto.getCreatedAt(),
+            null,
             null);
   }
 
@@ -80,7 +79,6 @@ class TimeDtoTest {
         .username("username")
         .track(Track.BABY_PARK_GCN)
         .duration(Duration.parse("PT1M7.48S"))
-        .createdAt(LocalDateTime.now())
         .combination(Combination.builder()
             .driver(Driver.FUNKY_KONG)
             .vehicle(Vehicle.BADWAGON)

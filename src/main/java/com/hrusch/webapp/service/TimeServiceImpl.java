@@ -5,6 +5,7 @@ import com.hrusch.webapp.model.Time;
 import com.hrusch.webapp.model.TimeDto;
 import com.hrusch.webapp.model.Track;
 import com.hrusch.webapp.repository.TimeRepository;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Optional;
 import org.modelmapper.ModelMapper;
@@ -35,8 +36,15 @@ public class TimeServiceImpl implements TimeService {
 
   @Override
   public void saveNewTime(TimeDto timeDto) {
-    Time time = modelMapper.map(timeDto, Time.class);
+    Time time = convertToTime(timeDto);
 
     timeRepository.saveTime(time);
+  }
+
+  private Time convertToTime(TimeDto timeDto) {
+    Time time = modelMapper.map(timeDto, Time.class);
+    time.setCreatedAt(LocalDateTime.now());
+
+    return time;
   }
 }

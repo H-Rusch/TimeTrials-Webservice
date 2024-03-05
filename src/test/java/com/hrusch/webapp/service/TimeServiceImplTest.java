@@ -116,7 +116,6 @@ class TimeServiceImplTest {
         .username(USERNAME)
         .track(TRACK)
         .duration(DURATION)
-        .createdAt(CREATED_AT)
         .build();
   }
 }
