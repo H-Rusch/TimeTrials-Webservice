@@ -1,7 +1,6 @@
 package com.hrusch.webapp.model.serialization;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;

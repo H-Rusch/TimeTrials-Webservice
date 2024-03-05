@@ -89,4 +89,9 @@ public class TimeRepositoryImpl implements TimeRepository {
         .stream()
         .findFirst();
   }
+
+  @Override
+  public Time saveTime(Time time) {
+    return mongoTemplate.save(time, COLLECTION);
+  }
 }
