@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hrusch.webservice.config.JacksonConfig;
+import com.hrusch.webservice.controller.response.ApiError;
 import com.hrusch.webservice.model.Time;
 import com.hrusch.webservice.model.TimeDto;
 import com.hrusch.webservice.model.Track;
@@ -27,6 +28,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -238,7 +240,7 @@ class TimeControllerWebLayerTest {
     @Test
     void givenTimeDto_whenSavingToDatabase_then201Returned() throws Exception {
       // given
-      RequestBuilder requestBuilder = buildPostNewTimeRequest();
+      RequestBuilder requestBuilder = buildPostNewTimeRequest(createSampleTimeDto());
 
       // when & then
       MvcResult mvcResult = mockMvc.perform(requestBuilder)
@@ -248,28 +250,34 @@ class TimeControllerWebLayerTest {
           .isEmpty();
     }
 
+    @ParameterizedTest
+    @MethodSource("invalidTimeDtoObjects")
+    void givenInvalidTimeDto_whenSavingToDatabase_then400Returned(TimeDto timeDto) throws Exception {
+      // given
+      RequestBuilder requestBuilder = buildPostNewTimeRequest(timeDto);
+
+      // when & then
+      MvcResult mvcResult = mockMvc.perform(requestBuilder)
+          .andExpect(status().isBadRequest())
+          .andReturn();
+      ApiError apiError = objectMapper
+          .readValue(mvcResult.getResponse().getContentAsString(), ApiError.class);
+      assertThat(apiError)
+          .extracting(
+              ApiError::getStatus,
+              ApiError::getMessage)
+          .containsExactly(
+              HttpStatus.BAD_REQUEST,
+              "Validation failed");
+    }
+
     @SneakyThrows
-    private RequestBuilder buildPostNewTimeRequest() {
-      TimeDto timeDto = createSampleTimeDto();
+    private RequestBuilder buildPostNewTimeRequest(TimeDto timeDto) {
       String json = objectMapper.writeValueAsString(timeDto);
 
       return MockMvcRequestBuilders.post(ENDPOINT)
           .contentType(MediaType.APPLICATION_JSON)
           .content(json);
-    }
-
-    @ParameterizedTest
-    @MethodSource("invalidTimeDtoObjects")
-    void givenInvalidTimeDto_whenSavingToDatabase_then400Returned() throws Exception {
-      // given
-      RequestBuilder requestBuilder = buildPostNewTimeRequest();
-
-      // when & then
-      MvcResult mvcResult = mockMvc.perform(requestBuilder)
-          .andExpect(status().isCreated())
-          .andReturn();
-      assertThat(mvcResult.getResponse().getContentAsString())
-          .isEmpty();
     }
 
     private static Stream<TimeDto> invalidTimeDtoObjects() {
