@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Optional;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,6 +18,7 @@ public class TimeServiceImpl implements TimeService {
   private final TimeRepository timeRepository;
   private final ModelMapper modelMapper;
 
+  @Autowired
   public TimeServiceImpl(TimeRepository timeRepository, ModelMapper modelMapper) {
     this.timeRepository = timeRepository;
     this.modelMapper = modelMapper;
