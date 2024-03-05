@@ -5,70 +5,11 @@ info:
   version: v0.1
   contact:
     name: H-Rusch
-    url: 'https://github.com/H-Rusch/SpringBoot-API/issues'
+    url: 'https://github.com/H-Rusch/SpringBoot-Webservice/issues'
 tags:
-  - name: users-api
-    description: API to store users in the database
   - name: times-api
-    description: API to store times for users in the database
+    description: API to store times in the database
 paths:
-  /users:
-    post:
-      tags:
-        - users-api
-      summary: Create a user
-      requestBody:
-        description: The user to create. The 'password' and 'repeatedPassword' fields have to match.
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserRequest'
-            example:
-              username: 'Username'
-              password: 'Password123'
-              repeatedPassword: 'Password123'
-      responses:
-        '201':
-          description: The created user object
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserDto'
-              example:
-                userId: '4c8eac33-15ed-4ddd-b8cd-8f836d641ec5'
-                username: 'Username'
-        '409':
-          description: CONFLICT as username is already taken
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-              example:
-                status: CONFLICT
-                message: 'The username has already been taken: Username'
-                timestamp: '2023-11-14 12:28:42'
-
-        '400':
-          description: BAD REQUEST
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-              example:
-                status: BAD_REQUEST
-                message: 'Validation failed'
-                timestamp: '2023-11-14 12:28:42'
-                subErrors:
-                  - type: validationError
-                    field: password
-                    rejectedValue: 12345678
-                    message: "The given password has an invalid format. It must contain a letter and a digit."
-                  - type: validationError
-                    field: repeatedPassword
-                    rejectedValue: 12345678
-                    message: "The given password has an invalid format. It must contain a letter and a digit."
-
   /times:
     post:
       tags:
@@ -80,33 +21,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TimeRequest'
+              $ref: '#/components/schemas/TimeDto'
             example:
-              userId: '4c8eac33-15ed-4ddd-b8cd-8f836d641ec5'
+              username: 'username'
               track: 'BABY_PARK_GCN'
               time: '1:05.480'
       responses:
         '201':
-          description: The created time object
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TimeDto'
-              example:
-                username: 'Username'
-                track: 'GCN Baby Park'
-                time: '1:05.480'
-                createdAt: '2023-11-20 15:28:15'
-        '409':
-          description: CONFLICT the given user does not exist
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-              example:
-                status: CONFLICT
-                message: 'User with the userId 4c8eac33-15ed-4ddd-b8cd-8f836d641ec5 does not exist.'
-                timestamp: '2023-11-14 12:28:42'
+          description: Confirmation that the time was saved
         '400':
           description: BAD REQUEST
           content:
@@ -119,9 +41,9 @@ paths:
                 timestamp: '2023-11-14 12:28:42'
                 subErrors:
                   - type: validationError
-                    field: repeatedPassword
-                    rejectedValue: abc1234567
-                    message: 'The given passwords have to match.'
+                    field: username
+                    rejectedValue:
+                    message: 'The given username is too short.'
 
   /times/best:
     get:
@@ -144,28 +66,18 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/TimeDto'
+                  $ref: '#/components/schemas/Time'
               example:
                 - username: 'Username'
                   track: 'GCN Baby Park'
-                  time: '1:05.480'
+                  duration: '1:05.480'
                   createdAt: '2023-11-20 15:28:15'
                 - username: 'Other Username'
                   track: 'Water Park'
-                  time: '1:24.534'
+                  duration: '1:24.534'
                   createdAt: '2023-11-20 12:03:26'
         '204':
           description: NO_CONTENT an empty response signalling no times were found.
-        '409':
-          description: CONFLICT the given user does not exist
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-              example:
-                status: CONFLICT
-                message: "User with the username 'username' does not exist."
-                timestamp: '2023-11-14 12:28:42'
   /times/best/{track}:
     get:
       tags:
@@ -177,7 +89,7 @@ paths:
           required: true
           schema:
             type: string
-          description: Specify which track to get the best time for
+          description: Required parameter which specifies which track to get the best time for.
         - in: query
           name: username
           required: false
@@ -191,11 +103,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TimeDto'
+                $ref: '#/components/schemas/Time'
               example:
                 username: 'Username'
                 track: 'GCN Baby Park'
-                time: '1:05.480'
+                duration: '1:05.480'
                 createdAt: '2023-11-20 15:28:15'
         '204':
           description: NO_CONTENT an empty response signalling no best time was found on that track (or for that user if specified).
@@ -208,16 +120,6 @@ paths:
               example:
                 status: BAD_REQUEST
                 message: "Track can not be built from value 'INVALID_TRACK'."
-                timestamp: '2023-11-14 12:28:42'
-        '409':
-          description: CONFLICT the given user does not exist
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-              example:
-                status: CONFLICT
-                message: "User with the username 'username' does not exist."
                 timestamp: '2023-11-14 12:28:42'
 
 components:
@@ -256,45 +158,6 @@ components:
         message:
           type: string
 
-    UserDto:
-      type: object
-      properties:
-        userId:
-          type: string
-        username:
-          type: string
-
-    UserRequest:
-      type: object
-      properties:
-        username:
-          type: string
-          minLength: 3
-          maxLength: 24
-        password:
-          type: string
-          minLength: 8
-        repeatedPassword:
-          type: string
-          minLength: 8
-      required:
-        - username
-        - password
-        - repeatedPassword
-
-    TimeRequest:
-      type: object
-      properties:
-        userId:
-          type: string
-          description: UUID of the user. A user with that id has to be present in the database
-        track:
-          type: string
-          description: The track the time was created for. This has to match either the ENUM constant or the enum constant's pretty name.
-        time:
-          type: string
-          description: The driven time. It has to be given in the format M:SS.msmsms
-
     TimeDto:
       type: object
       properties:
@@ -302,9 +165,38 @@ components:
           type: string
         track:
           type: string
-          description: Pretty name for the track
-        time:
+          description: The track the time was created for. This has to match either the ENUM constant or the enum constant's pretty name.
+        duration:
           type: string
+          description: The driven time. It has to be given in the format M:SS.msmsms
+        combination:
+          type: object
+          $ref: '#/components/schemas/Combination'
+
+    Time:
+      type: object
+      properties:
+        username:
+          type: string
+        track:
+          type: string
+          description: Pretty name for the track
+        duration:
+          type: string
+          description: The driven time. It has to be given in the format M:SS.msmsms
         createdAt:
           type: string
           description: Timestamp when the time was created in the format 'yyyy-MM-dd HH:mm:ss'
+
+    Combination:
+      type: object
+      description: The combination of driver and vehicle parts which was used for the driven time.
+      properties:
+        driver:
+          type: string
+        vehicle:
+          type: string
+        tires:
+          type: string
+        glider:
+          type: string
