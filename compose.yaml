@@ -1,6 +1,6 @@
 version: '3.8'
 services:
-  webapp:
+  webservice:
     build: .
     environment:
       MONGODB_URL: mongodb://database:27017/time-trials
