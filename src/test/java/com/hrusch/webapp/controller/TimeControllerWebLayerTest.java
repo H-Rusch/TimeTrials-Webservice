@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hrusch.webapp.config.JacksonConfig;
 import com.hrusch.webapp.model.Time;
+import com.hrusch.webapp.model.TimeDto;
 import com.hrusch.webapp.model.Track;
 import com.hrusch.webapp.service.TimeService;
 import java.time.Duration;
@@ -16,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
@@ -198,14 +201,13 @@ class TimeControllerWebLayerTest {
           time.getTrack(),
           time.getUsername());
 
-      // when
+      // when & then
       MvcResult mvcResult = mockMvc.perform(requestBuilder)
           .andExpect(status().isOk())
           .andReturn();
       Time times = objectMapper.readValue(mvcResult.getResponse().getContentAsString(),
           Time.class);
 
-      // then
       assertThat(times)
           .isEqualTo(time);
     }
@@ -229,8 +231,43 @@ class TimeControllerWebLayerTest {
     }
   }
 
+  @Nested
+  class TimeControllerSaveNewTimeTest {
+
+    @Test
+    void givenTimeDto_whenSavingToDatabase_then201Returned() throws Exception {
+      // given
+      RequestBuilder requestBuilder = buildPostNewTimeRequest();
+
+      // when & then
+      MvcResult mvcResult = mockMvc.perform(requestBuilder)
+          .andExpect(status().isCreated())
+          .andReturn();
+      assertThat(mvcResult.getResponse().getContentAsString())
+          .isEmpty();
+    }
+
+    @SneakyThrows
+    private RequestBuilder buildPostNewTimeRequest() {
+      TimeDto timeDto = createSampleTimeDto();
+      String json = objectMapper.writeValueAsString(timeDto);
+
+      return MockMvcRequestBuilders.post(ENDPOINT)
+          .contentType(MediaType.APPLICATION_JSON)
+          .content(json);
+    }
+  }
+
   private Time createSampleTime() {
     return Time.builder()
+        .username("username")
+        .track(Track.BABY_PARK_GCN)
+        .duration(Duration.parse("PT1M4.78S"))
+        .build();
+  }
+
+  private TimeDto createSampleTimeDto() {
+    return TimeDto.builder()
         .username("username")
         .track(Track.BABY_PARK_GCN)
         .duration(Duration.parse("PT1M4.78S"))

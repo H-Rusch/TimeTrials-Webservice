@@ -1,23 +1,38 @@
 package com.hrusch.webapp.service;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.hrusch.webapp.exception.ParameterErrorException;
+import com.hrusch.webapp.model.Time;
+import com.hrusch.webapp.model.TimeDto;
 import com.hrusch.webapp.model.Track;
 import com.hrusch.webapp.repository.TimeRepository;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
 
 @ExtendWith(MockitoExtension.class)
 class TimeServiceImplTest {
 
+  private static final String USERNAME = "username";
+  private static final Track TRACK = Track.BABY_PARK_GCN;
+  private static final Duration DURATION = Duration.parse("PT1M5,48S");
+  private static final LocalDateTime CREATED_AT = LocalDateTime.now();
+
+  @Mock
+  ModelMapper modelMapper;
   @Mock
   TimeRepository timeRepository;
 
@@ -71,5 +86,37 @@ class TimeServiceImplTest {
     private static Stream<String> usernameParameterVariations() {
       return Stream.of(null, "", "username");
     }
+  }
+
+  @Nested
+  class TimeServiceImplSaveTime {
+
+    @Test
+    void givenTimeDto_whenSaveTime_thenRepositoryMethodCalled() {
+      // given
+      TimeDto timeDto = createSampleTimeDto();
+      when(modelMapper.map(timeDto, Time.class))
+          .thenReturn(Time.builder()
+              .username(USERNAME)
+              .track(TRACK)
+              .duration(DURATION)
+              .createdAt(CREATED_AT)
+              .build());
+
+      // when
+      subject.saveNewTime(timeDto);
+
+      // then
+      verify(timeRepository).saveTime(any(Time.class));
+    }
+  }
+
+  private static TimeDto createSampleTimeDto() {
+    return TimeDto.builder()
+        .username(USERNAME)
+        .track(TRACK)
+        .duration(DURATION)
+        .createdAt(CREATED_AT)
+        .build();
   }
 }

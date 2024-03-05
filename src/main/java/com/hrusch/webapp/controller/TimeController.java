@@ -1,13 +1,17 @@
 package com.hrusch.webapp.controller;
 
 import com.hrusch.webapp.model.Time;
+import com.hrusch.webapp.model.TimeDto;
 import com.hrusch.webapp.model.Track;
 import com.hrusch.webapp.service.TimeService;
 import java.util.Collection;
 import java.util.List;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,5 +53,18 @@ public class TimeController {
     return timeService.getBestTimeForTrack(track, username)
         .map(ResponseEntity::ok)
         .orElse(ResponseEntity.noContent().build());
+  }
+
+  /**
+   * Save a new time to the database.
+   *
+   * @return ResponseEntity with a 201 status code signalling, the new time was created
+   * successfully.
+   */
+  @PostMapping
+  public ResponseEntity<Void> saveNewTime(@RequestBody TimeDto timeDto) {
+    timeService.saveNewTime(timeDto);
+
+    return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 }

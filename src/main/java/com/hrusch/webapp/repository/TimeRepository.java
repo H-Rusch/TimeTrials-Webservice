@@ -12,4 +12,6 @@ public interface TimeRepository {
     Collection<Time> findBestTimeForEachTrack(String username);
 
     Optional<Time> findBestTimeForTrack(Track track, String username);
+
+    Time saveTime(Time time);
 }

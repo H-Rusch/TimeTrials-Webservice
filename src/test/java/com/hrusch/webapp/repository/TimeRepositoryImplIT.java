@@ -10,6 +10,7 @@ import com.hrusch.webapp.model.Track;
 import com.hrusch.webapp.util.MongoDBTestContainerConfig;
 import com.hrusch.webapp.util.TestDataReader;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Optional;
 import lombok.SneakyThrows;
@@ -164,6 +165,56 @@ class TimeRepositoryImplIT extends MongoDBTestContainerConfig {
           .containsExactlyInAnyOrder(
               Tuple.tuple(username, Track.BABY_PARK_GCN, Duration.parse("PT1M7.48S")),
               Tuple.tuple(username, Track.MARIO_CIRCUIT, Duration.parse("PT1M34.123S")));
+    }
+  }
+
+  @Nested
+  class TimeRepositorySaveTimeTest {
+
+    @Test
+    void givenTime_whenSaveTime_thenTimeInDatabase() {
+      // given
+      Time time = createSampleTime();
+
+      // when
+      Time savedTime = subject.saveTime(time);
+
+      // then
+      assertThat(mongoTemplate.findById(savedTime.getId(), Time.class, COLLECTION))
+          .isNotNull();
+    }
+
+    @Test
+    void givenTime_whenSaveTime_thenReturnedObjectHasSameValuesAndFilledId() {
+      // given
+      Time time = createSampleTime();
+
+      // when
+      Time savedTime = subject.saveTime(time);
+
+      // then
+      assertThat(savedTime.getId())
+          .isNotNull();
+      assertThat(savedTime)
+          .extracting(
+              Time::getUsername,
+              Time::getTrack,
+              Time::getDuration,
+              Time::getCreatedAt)
+          .containsExactly(
+              savedTime.getUsername(),
+              savedTime.getTrack(),
+              savedTime.getDuration(),
+              savedTime.getCreatedAt());
+    }
+
+    private static Time createSampleTime() {
+      return Time.builder()
+          .username("username")
+          .duration(Duration.parse("PT1M7.48S"))
+          .track(Track.BABY_PARK_GCN)
+          .createdAt(LocalDateTime.now())
+          .build();
     }
   }
 }
