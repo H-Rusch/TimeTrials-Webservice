@@ -3,6 +3,14 @@ spring:
 
   data:
     mongodb:
-      uri: ${MONGODB_URL}
+      uri: ${MONGODB_URI}
+
+  kafka:
+    consumer:
+      group-id: ${CONSUMER_GROUP}
+      auto-offset-reset: earliest
+
+    bootstrap-servers: ${BOOTSTRAP_SERVERS}
+    new-time-topic: ${NEW_TIME_TOPIC}
 
 springdoc.swagger-ui.url: /swagger.yaml
