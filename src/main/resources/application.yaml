@@ -13,4 +13,8 @@ spring:
     bootstrap-servers: ${BOOTSTRAP_SERVERS}
     new-time-topic: ${NEW_TIME_TOPIC}
 
+service:
+  kafka:
+    enabled: ${ENABLE_KAFKA:true}
+
 springdoc.swagger-ui.url: /swagger.yaml
