@@ -20,6 +20,7 @@ public class TimeDto {
   @Size(min = 3, max = 32)
   private String username;
 
+  @NotNull
   private Track track;
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
