@@ -15,11 +15,13 @@ import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
+import org.springframework.util.backoff.FixedBackOff;
 
 @EnableKafka
 @Configuration
-@ConditionalOnProperty(name = "service.kafka.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "service.kafka.enabled", havingValue = "true", matchIfMissing = true)
 public class KafkaConsumerConfig {
 
   @Value("${spring.kafka.bootstrap-servers}")
@@ -57,6 +59,7 @@ public class KafkaConsumerConfig {
     ConcurrentKafkaListenerContainerFactory<String, TimeDto> factory =
         new ConcurrentKafkaListenerContainerFactory<>();
     factory.setConsumerFactory(consumerFactory());
+    factory.setCommonErrorHandler(new DefaultErrorHandler(new FixedBackOff(1000L, 0L)));
 
     return factory;
   }
