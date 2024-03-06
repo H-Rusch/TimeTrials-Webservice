@@ -1,6 +1,5 @@
 package com.hrusch.timetrials.webservice.util;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -9,7 +8,7 @@ import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 
 @TestConfiguration
-public class MongoDBTestContainerConfig {
+public class MongoDBTestcontainersConfig {
 
   @Container
   public static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:latest")
@@ -23,10 +22,5 @@ public class MongoDBTestContainerConfig {
   @BeforeAll
   static void setUp() {
     mongoDBContainer.start();
-  }
-
-  @AfterAll
-  static void tearDown() {
-    mongoDBContainer.stop();
   }
 }

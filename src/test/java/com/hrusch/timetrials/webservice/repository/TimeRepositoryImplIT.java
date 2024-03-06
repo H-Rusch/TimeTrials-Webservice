@@ -3,11 +3,10 @@ package com.hrusch.timetrials.webservice.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hrusch.timetrials.webservice.config.JacksonConfig;
 import com.hrusch.timetrials.webservice.config.MongoConfig;
 import com.hrusch.timetrials.webservice.model.Time;
-import com.hrusch.timetrials.webservice.util.MongoDBTestContainerConfig;
+import com.hrusch.timetrials.webservice.util.MongoDBTestcontainersConfig;
 import com.hrusch.timetrials.webservice.util.TestDataReader;
 import com.hrusch.timetrials.webservice.model.Track;
 import java.time.Duration;
@@ -32,7 +31,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @DataMongoTest
 @ExtendWith(SpringExtension.class)
 @Import({MongoConfig.class, JacksonConfig.class})
-class TimeRepositoryImplIT extends MongoDBTestContainerConfig {
+class TimeRepositoryImplIT extends MongoDBTestcontainersConfig {
 
   private static final String COLLECTION = "times";
   private static final String DATA_DIRECTORY = "repository";
