@@ -1,19 +1,21 @@
 package com.hrusch.timetrials.webservice.service;
 
+import com.hrusch.timetrials.webservice.exception.TimeDtoValidationException;
 import com.hrusch.timetrials.webservice.model.TimeDto;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Valid;
-import jakarta.validation.ValidationException;
 import jakarta.validation.Validator;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@ConditionalOnProperty(name = "service.kafka.enabled", havingValue = "true")
 public class NewTimeKafkaConsumerService {
 
   @Value("${spring.kafka.consumer.group-id}")
@@ -37,7 +39,7 @@ public class NewTimeKafkaConsumerService {
     Set<ConstraintViolation<TimeDto>> validationErrors = validator.validate(timeDto);
     if (!validationErrors.isEmpty()) {
       log.error("Validation failed for incoming timeDto: {}", timeDto);
-      throw new ValidationException(String.valueOf(validationErrors));
+      throw new TimeDtoValidationException(validationErrors);
     }
 
     timeRepository.saveNewTime(timeDto);
