@@ -8,8 +8,8 @@ import static org.mockito.Mockito.when;
 import com.hrusch.timetrials.webservice.exception.ParameterErrorException;
 import com.hrusch.timetrials.webservice.model.Time;
 import com.hrusch.timetrials.webservice.model.TimeDto;
-import com.hrusch.timetrials.webservice.repository.TimeRepository;
 import com.hrusch.timetrials.webservice.model.Track;
+import com.hrusch.timetrials.webservice.repository.TimeRepository;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.stream.Stream;
@@ -35,6 +35,8 @@ class TimeServiceImplTest {
   ModelMapper modelMapper;
   @Mock
   TimeRepository timeRepository;
+  @Mock
+  RecordKeeperService recordKeeperService;
 
   @InjectMocks
   TimeServiceImpl subject;
@@ -92,22 +94,23 @@ class TimeServiceImplTest {
   class TimeServiceImplSaveTime {
 
     @Test
-    void givenTimeDto_whenSaveTime_thenRepositoryMethodCalled() {
+    void givenTimeDto_whenSaveTime_thenCorrectMethodsCalled() {
       // given
       TimeDto timeDto = createSampleTimeDto();
+      Time timeToSave = createSampleTime(null);
+      Time savedTime = createSampleTime("id");
+
       when(modelMapper.map(timeDto, Time.class))
-          .thenReturn(Time.builder()
-              .username(USERNAME)
-              .track(TRACK)
-              .duration(DURATION)
-              .createdAt(CREATED_AT)
-              .build());
+          .thenReturn(timeToSave);
+      when(timeRepository.saveTime(any(Time.class)))
+          .thenReturn(savedTime);
 
       // when
       subject.saveNewTime(timeDto);
 
       // then
-      verify(timeRepository).saveTime(any(Time.class));
+      verify(timeRepository).saveTime(timeToSave);
+      verify(recordKeeperService).update(savedTime);
     }
   }
 
@@ -116,6 +119,16 @@ class TimeServiceImplTest {
         .username(USERNAME)
         .track(TRACK)
         .duration(DURATION)
+        .build();
+  }
+
+  private static Time createSampleTime(String id) {
+    return Time.builder()
+        .id(id)
+        .username(USERNAME)
+        .track(TRACK)
+        .duration(DURATION)
+        .createdAt(CREATED_AT)
         .build();
   }
 }
