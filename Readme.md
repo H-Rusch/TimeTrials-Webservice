@@ -18,12 +18,13 @@ It is available through the Swagger-UI at `/swagger-ui/index.html`.
 The webservice can be configured through environment variables. The following table shows the
 different variables that can be set.
 
-| Environment variable name | Description                                                                      | 
-|---------------------------|----------------------------------------------------------------------------------|
-| `MONGODB_URI`             | fully specified URI of the database                                              | 
-| `ENABLE_KAFKA`            | flag whether the Kafka consumer should be created. This option default to `true` | 
-| `CONSUMER_GROUP`          | group id for the Kafka consumer                                                  |
-| `BOOTSTRAP_SERVERS`       | list of Kafka servers to connect to                                              |
-| `NEW_TIME_TOPIC`          | name of the Kafka topic which is used for incoming new times                     |
+| Environment variable name  | Description                                                                                     | 
+|----------------------------|-------------------------------------------------------------------------------------------------|
+| `MONGODB_URI`              | fully specified URI of the database                                                             | 
+| `ENABLE_KAFKA`             | flag whether the Kafka consumer should be created. This option default to `true`                | 
+| `CONSUMER_GROUP`           | group id for the Kafka consumer                                                                 |
+| `BOOTSTRAP_SERVERS`        | list of Kafka servers to connect to                                                             |
+| `NEW_TIME_TOPIC`           | name of the Kafka topic which is used for incoming new times                                    |
+| `PUBLISH_NEW_RECORD_TOPIC` | name of the Kafka topic which is used for outgoing times which break the record for their track |
 
 

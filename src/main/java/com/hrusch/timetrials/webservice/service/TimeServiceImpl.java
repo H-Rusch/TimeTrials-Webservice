@@ -16,11 +16,15 @@ import org.springframework.stereotype.Service;
 public class TimeServiceImpl implements TimeService {
 
   private final TimeRepository timeRepository;
+  private final RecordKeeperService recordKeeperService;
   private final ModelMapper modelMapper;
 
   @Autowired
-  public TimeServiceImpl(TimeRepository timeRepository, ModelMapper modelMapper) {
+  public TimeServiceImpl(TimeRepository timeRepository,
+      RecordKeeperService recordKeeperService,
+      ModelMapper modelMapper) {
     this.timeRepository = timeRepository;
+    this.recordKeeperService = recordKeeperService;
     this.modelMapper = modelMapper;
   }
 
@@ -40,7 +44,9 @@ public class TimeServiceImpl implements TimeService {
   public void saveNewTime(TimeDto timeDto) {
     Time time = convertToTime(timeDto);
 
-    timeRepository.saveTime(time);
+    Time savedTime = timeRepository.saveTime(time);
+
+    recordKeeperService.update(savedTime);
   }
 
   private Time convertToTime(TimeDto timeDto) {

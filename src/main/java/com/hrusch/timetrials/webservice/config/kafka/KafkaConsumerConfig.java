@@ -1,4 +1,4 @@
-package com.hrusch.timetrials.webservice.config;
+package com.hrusch.timetrials.webservice.config.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hrusch.timetrials.webservice.model.TimeDto;

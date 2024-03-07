@@ -12,6 +12,7 @@ spring:
 
     bootstrap-servers: ${BOOTSTRAP_SERVERS}
     new-time-topic: ${NEW_TIME_TOPIC}
+    publish-new-record-topic: ${PUBLISH_NEW_RECORD_TOPIC}
 
 service:
   kafka:
