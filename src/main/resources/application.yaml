@@ -14,8 +14,4 @@ spring:
     new-time-topic: ${NEW_TIME_TOPIC}
     publish-new-record-topic: ${PUBLISH_NEW_RECORD_TOPIC}
 
-service:
-  kafka:
-    enabled: ${ENABLE_KAFKA:true}
-
 springdoc.swagger-ui.url: /swagger.yaml
