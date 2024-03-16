@@ -36,6 +36,8 @@ class TimeRepositoryImplIT extends MongoDBTestcontainersConfig {
   private static final String COLLECTION = "times";
   private static final String DATA_DIRECTORY = "repository";
 
+  private final TestDataReader testDataReader = new TestDataReader("testdata", DATA_DIRECTORY);
+
   @Autowired
   private MongoTemplate mongoTemplate;
 
@@ -45,7 +47,7 @@ class TimeRepositoryImplIT extends MongoDBTestcontainersConfig {
   void fillDatabase() {
     subject = new TimeRepositoryImpl(mongoTemplate);
 
-    TestDataReader.readAllFilesInDirectory(DATA_DIRECTORY)
+    testDataReader.readAllFilesInDirectory()
         .stream()
         .map(TimeRepositoryImplIT::convertJsonToTime)
         .forEach(time -> mongoTemplate.insert(time, COLLECTION));

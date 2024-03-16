@@ -8,9 +8,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hrusch.timetrials.webservice.config.JacksonConfig;
 import com.hrusch.timetrials.webservice.model.combination.Combination;
 import com.hrusch.timetrials.webservice.model.combination.Driver;
+import com.hrusch.timetrials.webservice.model.combination.Glider;
 import com.hrusch.timetrials.webservice.model.combination.Tires;
 import com.hrusch.timetrials.webservice.model.combination.Vehicle;
-import com.hrusch.timetrials.webservice.model.combination.Glider;
 import com.hrusch.timetrials.webservice.testutils.TestDataReader;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -24,6 +24,7 @@ class TimeTest {
   private static final String DIRECTORY = "model";
 
   private final ObjectMapper objectMapper = new JacksonConfig().objectMapper();
+  private final TestDataReader testDataReader = new TestDataReader("testdata", DIRECTORY);
 
   private final LocalDateTime timestamp = LocalDateTime.of(2023, 5, 25, 13, 37, 42);
   private final Duration duration = Duration.parse("PT1M7.48S");
@@ -51,8 +52,7 @@ class TimeTest {
   void givenTimeObjectWithCombination_whenSerializing_createJsonWithCombination()
       throws JsonProcessingException {
     // given
-    String expected = TestDataReader.readFileToString(DIRECTORY,
-        "time_valid_including_combination.json");
+    String expected = testDataReader.readFileToString("time_valid_including_combination.json");
 
     // when
     String json = objectMapper.writeValueAsString(subject);
@@ -65,8 +65,7 @@ class TimeTest {
   void givenTimeObjectWithoutCombination_whenSerializing_createJsonWithoutCombination()
       throws JsonProcessingException {
     // given
-    String expected = TestDataReader.readFileToString(DIRECTORY,
-        "time_valid_missing_combination.json");
+    String expected = testDataReader.readFileToString("time_valid_missing_combination.json");
     subject.setCombination(null);
 
     // when
@@ -81,7 +80,7 @@ class TimeTest {
   void givenValidTimeJsonWithoutCombination_whenDeserializing_thenCorrectObjectCreated()
       throws JsonProcessingException {
     // given
-    String json = TestDataReader.readFileToString(DIRECTORY, "time_valid_missing_combination.json");
+    String json = testDataReader.readFileToString("time_valid_missing_combination.json");
 
     // when
     Time time = objectMapper.readValue(json, Time.class);
@@ -104,8 +103,7 @@ class TimeTest {
   void givenValidTimeJsonWithCombination_whenDeserializing_thenCorrectObjectCreated()
       throws JsonProcessingException {
     // given
-    String json = TestDataReader.readFileToString(DIRECTORY,
-        "time_valid_including_combination.json");
+    String json = testDataReader.readFileToString("time_valid_including_combination.json");
 
     // when
     Time time = objectMapper.readValue(json, Time.class);
@@ -131,7 +129,7 @@ class TimeTest {
       strings = {"time_invalid_default_duration.json", "time_invalid_default_timestamp.json"})
   void givenInvalidTimeJson_whenDeserializing_thenExceptionIsThrown(String filename) {
     // given
-    String json = TestDataReader.readFileToString(DIRECTORY, filename);
+    String json = testDataReader.readFileToString(filename);
 
     // when & then
     assertThatThrownBy(() -> objectMapper.readValue(json, Time.class))
