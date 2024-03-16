@@ -1,4 +1,4 @@
-package com.hrusch.timetrials.webservice.util;
+package com.hrusch.timetrials.webservice.testutils;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.springframework.boot.test.context.TestConfiguration;

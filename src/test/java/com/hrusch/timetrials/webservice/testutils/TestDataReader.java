@@ -1,4 +1,4 @@
-package com.hrusch.timetrials.webservice.util;
+package com.hrusch.timetrials.webservice.testutils;
 
 import java.io.IOException;
 import java.net.URL;

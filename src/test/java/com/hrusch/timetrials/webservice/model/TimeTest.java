@@ -11,7 +11,7 @@ import com.hrusch.timetrials.webservice.model.combination.Driver;
 import com.hrusch.timetrials.webservice.model.combination.Tires;
 import com.hrusch.timetrials.webservice.model.combination.Vehicle;
 import com.hrusch.timetrials.webservice.model.combination.Glider;
-import com.hrusch.timetrials.webservice.util.TestDataReader;
+import com.hrusch.timetrials.webservice.testutils.TestDataReader;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
