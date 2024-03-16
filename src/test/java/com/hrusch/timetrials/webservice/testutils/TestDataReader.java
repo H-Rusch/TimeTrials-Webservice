@@ -9,34 +9,54 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 import lombok.SneakyThrows;
+import org.springframework.boot.test.context.TestComponent;
 
+@TestComponent
 public class TestDataReader {
 
-  private static final String TESTDATA_ROOT = "testdata";
+  private final Path BASE_DIRECTORY;
 
-  @SneakyThrows
-  public static String readFileToString(String directory, String filename) {
-    URL url = TestDataReader.class.getResource(
-        String.join("/", "", TESTDATA_ROOT, directory, filename));
+  public TestDataReader(String... baseDirectory) {
+    Path pathToGet = Paths.get("/", baseDirectory);
+    URL url = getClass().getResource(pathToGet.toString());
 
     if (Objects.isNull(url)) {
-      throw new IOException(filename);
+      throw new RuntimeException("problems with the path " + pathToGet);
     }
 
-    return Files.readString(Path.of(url.getPath()));
+    this.BASE_DIRECTORY = pathToGet;
   }
 
   @SneakyThrows
-  public static List<String> readAllFilesInDirectory(String directory) {
-    URL url = TestDataReader.class.getResource(
-        String.join("/", "", TESTDATA_ROOT, directory));
-    Path resourcePath = Paths.get(Objects.requireNonNull(url).toURI());
+  public String readFileToString(String filename) {
+    Path pathToGet = BASE_DIRECTORY.resolve(Path.of(filename));
+    URL url = getClass().getResource(pathToGet.toString());
 
-    try (Stream<Path> filesStream = Files.list(resourcePath)) {
-      return filesStream.filter(Files::isRegularFile)
-          .map(Path::getFileName)
-          .map(filename -> readFileToString(directory, String.valueOf(filename)))
+    if (Objects.isNull(url)) {
+      throw new IOException(pathToGet.toString());
+    }
+
+    return readFileToString(Path.of(url.getPath()));
+  }
+
+  @SneakyThrows
+  public List<String> readAllFilesInDirectory() {
+    URL url = getClass().getResource(BASE_DIRECTORY.toString());
+
+    if (Objects.isNull(url)) {
+      throw new IOException(BASE_DIRECTORY.toString());
+    }
+
+    try (Stream<Path> filesStream = Files.list(Paths.get(url.toURI()))) {
+      return filesStream
+          .filter(Files::isRegularFile)
+          .map(this::readFileToString)
           .toList();
     }
+  }
+
+  @SneakyThrows
+  private String readFileToString(Path path) {
+    return Files.readString(path);
   }
 }

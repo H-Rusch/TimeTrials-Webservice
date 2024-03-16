@@ -20,6 +20,7 @@ class CombinationTest {
   private static final String DIRECTORY = "model";
 
   private final ObjectMapper objectMapper = new JacksonConfig().objectMapper();
+  private final TestDataReader testDataReader = new TestDataReader("testdata", DIRECTORY);
 
   private final Combination subject = new Combination(
       Driver.FUNKY_KONG,
@@ -30,7 +31,7 @@ class CombinationTest {
   @Test
   void givenCombinationObject_whenSerializing_produceCorrectJson() throws JsonProcessingException {
     // given
-    String expected = TestDataReader.readFileToString(DIRECTORY, "combination_valid.json");
+    String expected = testDataReader.readFileToString("combination_valid.json");
 
     // when
     String json = objectMapper.writeValueAsString(subject);
@@ -43,7 +44,7 @@ class CombinationTest {
   void givenValidCombinationJson_whenDeserializing_produceCorrectObject()
       throws JsonProcessingException {
     // given
-    String json = TestDataReader.readFileToString(DIRECTORY, "combination_valid.json");
+    String json = testDataReader.readFileToString("combination_valid.json");
 
     // when
     Combination combination = objectMapper.readValue(json, Combination.class);
@@ -61,7 +62,7 @@ class CombinationTest {
   })
   void givenInvalidCombinationJson_whenDeserializing_throwException(String file) {
     // given
-    String json = TestDataReader.readFileToString(DIRECTORY, file);
+    String json = testDataReader.readFileToString(file);
 
     // when & then
     assertThatThrownBy(() -> objectMapper.readValue(json, Combination.class))
