@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hrusch.timetrials.webservice.config.JacksonConfig;
-import com.hrusch.timetrials.webservice.util.TestDataReader;
+import com.hrusch.timetrials.webservice.testutils.TestDataReader;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
