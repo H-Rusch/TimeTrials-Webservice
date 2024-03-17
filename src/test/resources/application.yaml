@@ -1,8 +1,11 @@
 spring:
-  main.banner-mode: off
-
   data:
     mongodb:
-      host: localhost
-      port: 27017
       database: test_db
+
+  kafka:
+    consumer:
+      group-id: test-consumer-group
+
+    new-time-topic: new-time-test
+    publish-new-record-topic: new-record-test

@@ -1,26 +1,23 @@
 package com.hrusch.timetrials.webservice.testutils;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
+@Testcontainers
 @TestConfiguration
 public class MongoDBTestcontainersConfig {
 
   @Container
-  public static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:latest")
-      .withExposedPorts(27017);
+  private static final MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:latest");
 
-  @DynamicPropertySource
-  static void mongoProperties(DynamicPropertyRegistry registry) {
-    registry.add("spring.data.mongodb.uri", mongoDBContainer::getConnectionString);
+  static {
+    mongoDBContainer.start();
+    setMongoProperties();
   }
 
-  @BeforeAll
-  static void setUp() {
-    mongoDBContainer.start();
+  static void setMongoProperties() {
+    System.setProperty("spring.data.mongodb.uri", mongoDBContainer.getConnectionString());
   }
 }

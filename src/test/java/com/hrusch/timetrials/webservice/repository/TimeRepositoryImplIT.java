@@ -30,8 +30,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @DataMongoTest
 @ExtendWith(SpringExtension.class)
-@Import({MongoConfig.class, JacksonConfig.class})
-class TimeRepositoryImplIT extends MongoDBTestcontainersConfig {
+@Import({MongoConfig.class, MongoDBTestcontainersConfig.class})
+class TimeRepositoryImplIT {
 
   private static final String COLLECTION = "times";
   private static final String DATA_DIRECTORY = "repository";
