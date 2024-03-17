@@ -5,11 +5,17 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+
 
 public class StepDefinitions {
 
-  @Autowired
+  private static final String COLLECTION = "times";
+
   private TestDataReader testDataReader;
+
+  @Autowired
+  private MongoTemplate mongoTemplate;
 
   @Given("time {word} is stored in the database")
   public void timeIsStoredInTheDatabase(String filename) {
@@ -19,11 +25,11 @@ public class StepDefinitions {
   @When("testing")
   public void testing() {
     System.out.println("testing");
+    System.out.println(mongoTemplate);
   }
 
   @Then("assert something")
   public void assertSomething() {
     System.out.println("as");
   }
-
 }
