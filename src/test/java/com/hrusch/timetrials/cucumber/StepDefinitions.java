@@ -16,10 +16,12 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import java.util.List;
 import lombok.SneakyThrows;
+import org.apache.http.entity.ContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 
 
 public class StepDefinitions {
@@ -50,6 +52,7 @@ public class StepDefinitions {
         .basePath(BASE_PATH);
   }
 
+  // Given
   @Given("configured path to be {word}")
   public void configurePath(String path) {
     testDataReader = new TestDataReader(path.split("/"));
@@ -67,6 +70,7 @@ public class StepDefinitions {
     mongoTemplate.save(convertToTime(json), COLLECTION);
   }
 
+  // When
   @When("request is made to {word} without giving a username")
   public void requestIsMadeToEndpointWithoutUsername(String endpoint) {
     response = request.get(endpoint);
@@ -77,6 +81,22 @@ public class StepDefinitions {
     response = request.param("username", username).get(endpoint);
   }
 
+  @When("posting new time {word}")
+  public void postingNewTime(String filename) {
+    String timeDtoJson = testDataReader.readFileToString(filename);
+
+    response = request.contentType(String.valueOf(ContentType.APPLICATION_JSON))
+        .body(timeDtoJson)
+        .post();
+  }
+
+  // Then
+  @Then("response code is {int}")
+  public void responseCodeIs(int code) {
+    assertThat(response.statusCode())
+        .isEqualTo(code);
+  }
+
   @Then("response contains the following times")
   public void responseContainsTimes(List<String> timeFiles) {
     List<Time> expectedTimes = timeFiles.stream()
@@ -84,8 +104,6 @@ public class StepDefinitions {
         .map(this::convertToTime)
         .toList();
 
-    assertThat(response.statusCode())
-        .isEqualTo(HttpStatus.OK.value());
     assertThat(response.body().jsonPath().getList("", Time.class))
         .containsExactlyInAnyOrderElementsOf(expectedTimes);
   }
@@ -94,10 +112,34 @@ public class StepDefinitions {
   public void responseContainsTimes(String timeFile) {
     Time expectedTime = convertToTime(testDataReader.readFileToString(timeFile));
 
-    assertThat(response.statusCode())
-        .isEqualTo(HttpStatus.OK.value());
     assertThat(response.body().jsonPath().getObject("", Time.class))
         .isEqualTo(expectedTime);
+  }
+
+  @Then("database contains time {word}")
+  public void databaseContainsTime(String filename) {
+    Time expectedTime = convertToTime(testDataReader.readFileToString(filename));
+
+    Query query = new Query(
+        new Criteria().andOperator(
+            Criteria.where("username").is(expectedTime.getUsername()),
+            Criteria.where("track").is(expectedTime.getTrack().name()),
+            Criteria.where("duration").is(expectedTime.getDuration())));
+
+    List<Time> result = mongoTemplate.find(query, Time.class, COLLECTION);
+
+    assertThat(result).hasSize(1);
+    assertThat(result.get(0))
+        .extracting(
+            Time::getUsername,
+            Time::getTrack,
+            Time::getCombination,
+            Time::getDuration)
+        .containsExactly(
+            expectedTime.getUsername(),
+            expectedTime.getTrack(),
+            expectedTime.getCombination(),
+            expectedTime.getDuration());
   }
 
   @SneakyThrows
