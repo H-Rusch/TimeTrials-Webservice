@@ -32,20 +32,18 @@ public class JacksonConfig {
   }
 
   private static Module createDurationModule() {
-    SimpleModule durationModule = new SimpleModule();
-    durationModule.addSerializer(Duration.class, new CustomDurationSerializer());
-    durationModule.addDeserializer(Duration.class, new CustomDurationDeserializer());
-
-    return durationModule;
+    return new SimpleModule()
+        .addSerializer(Duration.class, new CustomDurationSerializer())
+        .addDeserializer(Duration.class, new CustomDurationDeserializer());
   }
 
   private static Module createLocalDateTimeModule() {
-    SimpleModule dateTimeModule = new SimpleModule();
-    dateTimeModule.addSerializer(LocalDateTime.class,
-        new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(DATETIME_PATTERN)));
-    dateTimeModule.addDeserializer(LocalDateTime.class,
-        new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(DATETIME_PATTERN)));
-
-    return dateTimeModule;
+    return new SimpleModule()
+        .addSerializer(
+            LocalDateTime.class,
+            new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(DATETIME_PATTERN)))
+        .addDeserializer(
+            LocalDateTime.class,
+            new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(DATETIME_PATTERN)));
   }
 }
