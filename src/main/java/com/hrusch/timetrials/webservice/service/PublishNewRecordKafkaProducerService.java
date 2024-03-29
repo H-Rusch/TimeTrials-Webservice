@@ -15,7 +15,7 @@ public class PublishNewRecordKafkaProducerService {
   @Value("${spring.kafka.publish-new-record-topic}")
   private String topicName;
 
-  private final KafkaTemplate<String, Time> kafkaTemplate;
+  private final KafkaTemplate<String, Object> kafkaTemplate;
 
   public void publish(Time time) {
     log.info("Publishing new record: {}", time);

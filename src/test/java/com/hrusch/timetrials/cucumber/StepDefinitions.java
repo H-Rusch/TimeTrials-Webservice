@@ -1,9 +1,11 @@
 package com.hrusch.timetrials.cucumber;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hrusch.timetrials.webservice.model.Time;
+import com.hrusch.timetrials.webservice.model.TimeDto;
 import com.hrusch.timetrials.webservice.testutils.TestDataReader;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
@@ -14,14 +16,17 @@ import io.restassured.config.ObjectMapperConfig;
 import io.restassured.config.RestAssuredConfig;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import java.time.Duration;
 import java.util.List;
 import lombok.SneakyThrows;
 import org.apache.http.entity.ContentType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.kafka.core.KafkaTemplate;
 
 
 public class StepDefinitions {
@@ -31,11 +36,15 @@ public class StepDefinitions {
 
   @LocalServerPort
   private int port;
+  @Value("${spring.kafka.new-time-topic}")
+  private String newTimeTopic;
 
+  @Autowired
+  private ObjectMapper objectMapper;
   @Autowired
   private MongoTemplate mongoTemplate;
   @Autowired
-  private ObjectMapper objectMapper;
+  private KafkaTemplate<String, Object> kafkaTemplate;
 
   private TestDataReader testDataReader;
   private RequestSpecification request;
@@ -88,6 +97,17 @@ public class StepDefinitions {
     response = request.contentType(String.valueOf(ContentType.APPLICATION_JSON))
         .body(timeDtoJson)
         .post();
+  }
+
+  @When("writing Kafka message {word}")
+  public void writingKafkaMessage(String filename) {
+    TimeDto timeDto = convertToTimeDto(testDataReader.readFileToString(filename));
+
+    kafkaTemplate.send(newTimeTopic, timeDto);
+
+    await()
+        .pollDelay(Duration.ofSeconds(3))
+        .until(() -> true);
   }
 
   // Then
@@ -145,5 +165,10 @@ public class StepDefinitions {
   @SneakyThrows
   private Time convertToTime(String jsonString) {
     return objectMapper.readValue(jsonString, Time.class);
+  }
+
+  @SneakyThrows
+  private TimeDto convertToTimeDto(String jsonString) {
+    return objectMapper.readValue(jsonString, TimeDto.class);
   }
 }

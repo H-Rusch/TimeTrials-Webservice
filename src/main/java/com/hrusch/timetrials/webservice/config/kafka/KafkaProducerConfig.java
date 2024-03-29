@@ -1,7 +1,6 @@
 package com.hrusch.timetrials.webservice.config.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hrusch.timetrials.webservice.model.Time;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +32,7 @@ public class KafkaProducerConfig {
   }
 
   @Bean
-  public ProducerFactory<String, Time> producerFactory() {
+  public ProducerFactory<String, Object> producerFactory() {
     return new DefaultKafkaProducerFactory<>(
         producerConfigs(),
         new StringSerializer(),
@@ -41,7 +40,7 @@ public class KafkaProducerConfig {
   }
 
   @Bean
-  public KafkaTemplate<String, Time> kafkaTemplate() {
+  public KafkaTemplate<String, Object> kafkaTemplate() {
     return new KafkaTemplate<>(producerFactory());
   }
 }
