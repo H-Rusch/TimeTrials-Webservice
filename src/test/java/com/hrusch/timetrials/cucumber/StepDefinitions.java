@@ -67,6 +67,19 @@ public class StepDefinitions {
     testDataReader = new TestDataReader(path.split("/"));
   }
 
+  @Given("database does not contain time {word}")
+  public void databaseDoesNotContainTime(String filename) {
+    Time time = convertToTime(testDataReader.readFileToString(filename));
+
+    Query query = new Query(
+        new Criteria().andOperator(
+            Criteria.where("username").is(time.getUsername()),
+            Criteria.where("track").is(time.getTrack().name()),
+            Criteria.where("duration").is(time.getDuration())));
+
+    mongoTemplate.remove(query, COLLECTION);
+  }
+
   @Given("times are stored in the database")
   public void timesAreStoredInTheDatabase(List<String> filenames) {
     filenames.forEach(this::timeIsStoredInTheDatabase);

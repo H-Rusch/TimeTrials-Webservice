@@ -5,5 +5,6 @@ Feature: Add Time via Kafka
     Given configured path to be cit/add-time
 
   Scenario: Database contains time after its submitted through Kafka
+    Given database does not contain time name_BabyPark_1-20-123.json
     When writing Kafka message TimeDto_name_BabyPark_1-20-123.json
     Then database contains time name_BabyPark_1-20-123.json
