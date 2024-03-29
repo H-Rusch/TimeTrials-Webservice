@@ -58,9 +58,6 @@ public class TimeController {
 
   /**
    * Save a new time to the database.
-   *
-   * @return ResponseEntity with a 201 status code signalling, the new time was created
-   * successfully.
    */
   @PostMapping
   public ResponseEntity<Void> saveNewTime(@RequestBody @Valid TimeDto timeDto) {
