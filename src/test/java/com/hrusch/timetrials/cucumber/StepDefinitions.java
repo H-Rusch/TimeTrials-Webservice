@@ -14,12 +14,12 @@ import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
 import io.restassured.config.ObjectMapperConfig;
 import io.restassured.config.RestAssuredConfig;
+import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import java.time.Duration;
 import java.util.List;
 import lombok.SneakyThrows;
-import org.apache.http.entity.ContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -62,8 +62,8 @@ public class StepDefinitions {
   }
 
   // Given
-  @Given("configured path to be {word}")
-  public void configurePath(String path) {
+  @Given("configured filepath to be {word}")
+  public void configureFilepath(String path) {
     testDataReader = new TestDataReader(path.split("/"));
   }
 
@@ -105,10 +105,10 @@ public class StepDefinitions {
 
   @When("posting new time {word}")
   public void postingNewTime(String filename) {
-    String timeDtoJson = testDataReader.readFileToString(filename);
+    String timeRequestJson = testDataReader.readFileToString(filename);
 
-    response = request.contentType(String.valueOf(ContentType.APPLICATION_JSON))
-        .body(timeDtoJson)
+    response = request.contentType(ContentType.JSON)
+        .body(timeRequestJson)
         .post();
   }
 

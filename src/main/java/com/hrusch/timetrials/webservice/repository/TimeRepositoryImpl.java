@@ -1,8 +1,8 @@
 package com.hrusch.timetrials.webservice.repository;
 
 import com.hrusch.timetrials.webservice.model.Time;
-import com.hrusch.timetrials.webservice.util.CriteriaUtil;
 import com.hrusch.timetrials.webservice.model.Track;
+import com.hrusch.timetrials.webservice.util.CriteriaUtil;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;

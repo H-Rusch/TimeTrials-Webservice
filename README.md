@@ -3,18 +3,36 @@
 This application is a Spring Boot based webservice that provides a REST API to save and query times
 driven in Mario Kart 8 Deluxe Time Trials.
 
-This service uses Kafka to consume new times and to publish new records when the record for a track
-is broken.
+Additionally, this service uses Kafka to consume new times and to publish new records when the
+record for a track is broken.
 
-A MongoDB database is being used to store the data.
+MongoDB is used to store the data.
 
 ## Build
 
-This application is set up to be run with Docker. The `Dockerfile` will start the service by running
-the services jar. Therefore, the jar has to be created first by running `mvn package`.
+Running the tests requires a running Docker instance,
+since [Testcontiners](https://testcontainers.com/) are used for Kafka and the MongoDB.
+The tests can be started using
 
-In order to test the application in a full dev environment, Docker Compose can be used. The full
-environment is defined in `compose.yaml` and can be started by running `docker compose up`.
+```sh
+mvn verify
+```
+
+This application is set up to be run with Docker. The `Dockerfile` will start the service by running
+the services jar. Therefore, the jar has to be created first by running
+
+```sh
+mvn package
+```
+
+### Run locally
+
+Docker Compose can be used in order to test the application and all dependencies locally. The full
+environment is defined in `compose.yaml` and can be started by running
+
+```sh
+docker compose up
+```
 
 ## Swagger UI
 
@@ -34,5 +52,3 @@ different variables that can be set.
 | `BOOTSTRAP_SERVERS`        | list of Kafka servers to connect to                                                             |
 | `NEW_TIME_TOPIC`           | name of the Kafka topic which is used for incoming new times                                    |
 | `PUBLISH_NEW_RECORD_TOPIC` | name of the Kafka topic which is used for outgoing times which break the record for their track |
-
-

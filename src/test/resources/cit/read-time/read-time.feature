@@ -2,7 +2,7 @@ Feature: Read times
   Times stored in the database should be accessible via HTTP request
 
   Background:
-    Given configured path to be cit/read-time
+    Given configured filepath to be cit/read-time
     And times are stored in the database
       | name_BabyPark_1-08-480.json      |
       | name_BabyPark_1-09-480.json      |

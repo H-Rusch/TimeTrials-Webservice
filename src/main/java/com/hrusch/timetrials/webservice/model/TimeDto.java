@@ -5,6 +5,7 @@ import com.hrusch.timetrials.webservice.model.combination.Combination;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,4 +29,6 @@ public class TimeDto {
 
   @NotNull
   private Duration duration;
+
+  private LocalDateTime createdAt;
 }

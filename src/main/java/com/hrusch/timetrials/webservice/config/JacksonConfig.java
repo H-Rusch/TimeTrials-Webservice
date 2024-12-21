@@ -1,5 +1,6 @@
 package com.hrusch.timetrials.webservice.config;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -28,6 +29,7 @@ public class JacksonConfig {
         .addModule(createDurationModule())
         .addModule(createLocalDateTimeModule())
         .configure(SerializationFeature.INDENT_OUTPUT, true)
+        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
         .build();
   }
 

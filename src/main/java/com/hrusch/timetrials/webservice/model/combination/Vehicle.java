@@ -8,12 +8,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public enum Vehicle {
+
   STANDARD_KART("Standard Kart"),
   PIPE_FRAME("Pipe Frame"),
   MACH_8("Mach 8"),
@@ -67,6 +68,7 @@ public enum Vehicle {
   }
 
   @JsonValue
+  // TODO rename to 'name'
   private final String value;
 
   @JsonCreator

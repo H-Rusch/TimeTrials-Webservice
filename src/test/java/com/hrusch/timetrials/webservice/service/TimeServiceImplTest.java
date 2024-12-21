@@ -1,17 +1,19 @@
 package com.hrusch.timetrials.webservice.service;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.hrusch.timetrials.webservice.exception.ParameterErrorException;
+import com.hrusch.timetrials.webservice.mapper.TimeMapper;
 import com.hrusch.timetrials.webservice.model.Time;
 import com.hrusch.timetrials.webservice.model.TimeDto;
 import com.hrusch.timetrials.webservice.model.Track;
 import com.hrusch.timetrials.webservice.repository.TimeRepository;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -21,7 +23,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
 
 @ExtendWith(MockitoExtension.class)
 class TimeServiceImplTest {
@@ -32,7 +33,7 @@ class TimeServiceImplTest {
   private static final LocalDateTime CREATED_AT = LocalDateTime.now();
 
   @Mock
-  ModelMapper modelMapper;
+  TimeMapper timeMapper;
   @Mock
   TimeRepository timeRepository;
   @Mock
@@ -42,7 +43,7 @@ class TimeServiceImplTest {
   TimeServiceImpl subject;
 
   @Nested
-  class TimeServiceImplGetBestTimeForEachTrackTest {
+  class TimeServiceImpl_GetBestTimeForEachTrack_Test {
 
     @ParameterizedTest
     @MethodSource("usernameParameterVariations")
@@ -60,7 +61,7 @@ class TimeServiceImplTest {
   }
 
   @Nested
-  class TimeServiceImplGetBestTimeForTrackTest {
+  class TimeServiceImpl_GetBestTimeForTrack_Test {
 
     @ParameterizedTest
     @MethodSource("usernameParameterVariations")
@@ -78,11 +79,12 @@ class TimeServiceImplTest {
 
     @ParameterizedTest
     @MethodSource("usernameParameterVariations")
-    void givenNullAsTrack_whenGetBestTimeForTrack_thenException(String username) {
-      // given, when & then
-      assertThatThrownBy(() -> subject.getBestTimeForTrack(null, username))
-          .isInstanceOf(ParameterErrorException.class)
-          .hasMessage("The required parameter 'track' contains an error.");
+    void givenNullAsTrack_whenGetBestTimeForTrack_thenReturnEmptyOptional(String username) {
+      // given & when
+      Optional<TimeDto> result = subject.getBestTimeForTrack(null, username);
+
+      // then
+      assertThat(result).isEmpty();
     }
 
     private static Stream<String> usernameParameterVariations() {
@@ -91,7 +93,7 @@ class TimeServiceImplTest {
   }
 
   @Nested
-  class TimeServiceImplSaveTime {
+  class TimeServiceImpl_SaveNewTime_Test {
 
     @Test
     void givenTimeDto_whenSaveTime_thenCorrectMethodsCalled() {
@@ -100,7 +102,7 @@ class TimeServiceImplTest {
       Time timeToSave = createSampleTime(null);
       Time savedTime = createSampleTime("id");
 
-      when(modelMapper.map(timeDto, Time.class))
+      when(timeMapper.map(eq(timeDto), any(LocalDateTime.class)))
           .thenReturn(timeToSave);
       when(timeRepository.saveTime(any(Time.class)))
           .thenReturn(savedTime);

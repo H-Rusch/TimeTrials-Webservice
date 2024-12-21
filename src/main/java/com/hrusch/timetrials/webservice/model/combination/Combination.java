@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Combination {
+public class  Combination {
 
   @NotNull
   private Driver driver;
