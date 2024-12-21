@@ -5,15 +5,17 @@ info:
   version: v0.1
   contact:
     name: H-Rusch
-    url: 'https://github.com/H-Rusch/SpringBoot-Webservice/issues'
+    url: 'https://github.com/H-Rusch/TimeTrials-Webservice/issues'
 tags:
   - name: times-api
     description: API to store times in the database
+
 paths:
   /times:
     post:
       tags:
         - times-api
+      operationId: SaveNewTime
       summary: Create a time for a user
       requestBody:
         description: The time to create
@@ -21,7 +23,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TimeDto'
+              $ref: '#/components/schemas/TimeRequest'
             example:
               username: 'username'
               track: 'BABY_PARK_GCN'
@@ -34,7 +36,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiError'
+                $ref: '#/components/schemas/ErrorResponse'
               example:
                 status: BAD_REQUEST
                 message: 'Validation failed'
@@ -49,6 +51,7 @@ paths:
     get:
       tags:
         - times-api
+      operationId: GetBestTimeForEachTrack
       summary: Get a list of the best time for each track
       parameters:
         - in: query
@@ -66,7 +69,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Time'
+                  $ref: '#/components/schemas/TimeResponse'
               example:
                 - username: 'Username'
                   track: 'GCN Baby Park'
@@ -78,10 +81,12 @@ paths:
                   createdAt: '2023-11-20 12:03:26'
         '204':
           description: NO_CONTENT an empty response signalling no times were found.
+
   /times/best/{track}:
     get:
       tags:
         - times-api
+      operationId: GetBestTimeForTrack
       summary: Get the best best time for a specific track
       parameters:
         - in: path
@@ -103,7 +108,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Time'
+                $ref: '#/components/schemas/TimeResponse'
               example:
                 username: 'Username'
                 track: 'GCN Baby Park'
@@ -116,7 +121,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiError'
+                $ref: '#/components/schemas/ErrorResponse'
               example:
                 status: BAD_REQUEST
                 message: "Track can not be built from value 'INVALID_TRACK'."
@@ -124,68 +129,91 @@ paths:
 
 components:
   schemas:
-    ApiError:
+    ErrorResponse:
       type: object
+      description: Response sent to the user when there was an error performing an API request
       properties:
         status:
-          type: string
+          type: int
+          description: HTTP status code showing what went wrong
         message:
           type: string
         timestamp:
           type: string
           description: timestamp in the format 'yyyy-MM-dd HH:mm:ss'
+          format: date-time
         subErrors:
           type: array
+          description: Collection of sub-errors showing what went wrong in more detail
           items:
-            $ref: '#/components/schemas/ApiSubError'
+            $ref: '#/components/schemas/SubError'
 
-    ApiSubError:
-      oneOf:
-        - $ref: '#/components/schemas/ApiValidationError'
+    SubError:
+      description: Base-class for possible sub-errors, detailing what went wrong exactly (Currently there is only one)
       discriminator:
         propertyName: type
-        mapping:
-          validationError: '#/components/schemas/ApiValidationError'
+      additionalProperties: true
+      oneOf:
+        - $ref: '#/components/schemas/ValidationError'
 
-    ApiValidationError:
+    ValidationError:
       type: object
+      description: Sub-error which provides details that a field did not pass validation
       properties:
+        type:
+          type: string
         field:
           type: string
+          description: For which field was a value rejected
         rejectedValue:
           type: object
           description: The value for which the validation failed
         message:
           type: string
 
-    TimeDto:
+    TimeRequest:
       type: object
+      description: Request entity to be sent when submitting a new time
+      required:
+        - username
+        - track
+        - duration
       properties:
         username:
           type: string
+          minLength: 3
+          maxLength: 32
         track:
           type: string
           description: The track the time was created for. This has to match either the ENUM constant or the enum constant's pretty name.
         duration:
           type: string
+          pattern: ^(\d+):(\d{2})\.(\d{3})$
           description: The driven time. It has to be given in the format M:SS.msmsms
         combination:
           type: object
           $ref: '#/components/schemas/Combination'
 
-    Time:
+    TimeResponse:
       type: object
+      description: Response entity returned to the user
       properties:
         username:
           type: string
+          description: Name of the user who drove that time
         track:
           type: string
           description: Pretty name for the track
         duration:
           type: string
-          description: The driven time. It has to be given in the format M:SS.msmsms
+          description: The driven time. Will be given in the format M:SS.msmsms
+        combination:
+          type: object
+          description: Vehicle combination the time was set in
+          $ref: '#/components/schemas/Combination'
         createdAt:
           type: string
+          format: date-time
           description: Timestamp when the time was created in the format 'yyyy-MM-dd HH:mm:ss'
 
     Combination:

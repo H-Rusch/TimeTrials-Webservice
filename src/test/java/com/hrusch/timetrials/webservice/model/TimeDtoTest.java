@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.hrusch.timetrials.webservice.model.combination.Combination;
 import com.hrusch.timetrials.webservice.model.combination.Driver;
+import com.hrusch.timetrials.webservice.model.combination.Glider;
 import com.hrusch.timetrials.webservice.model.combination.Tires;
 import com.hrusch.timetrials.webservice.model.combination.Vehicle;
-import com.hrusch.timetrials.webservice.model.combination.Glider;
 import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

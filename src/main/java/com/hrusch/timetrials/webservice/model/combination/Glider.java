@@ -9,12 +9,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public enum Glider {
+
   SUPER_GLIDER("Super Glider"),
   CLOUD_GLIDER("Cloud Glider"),
   WARIO_WING("Wario Wing"),

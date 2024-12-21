@@ -1,8 +1,9 @@
 package com.hrusch.timetrials.webservice.controller;
 
-import com.hrusch.timetrials.webservice.controller.response.ApiError;
-import com.hrusch.timetrials.webservice.controller.response.ApiValidationError;
-import com.hrusch.timetrials.webservice.exception.ParameterErrorException;
+import com.hrusch.openapi.model.MkApiErrorResponse;
+import com.hrusch.openapi.model.MkApiValidationError;
+import com.hrusch.timetrials.webservice.exception.TrackDeserializationException;
+import java.time.LocalDateTime;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -27,7 +28,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
       HttpHeaders headers,
       HttpStatusCode status,
       WebRequest request) {
-    return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, e.getMessage()));
+    return buildResponseEntity(new MkApiErrorResponse()
+        .status(HttpStatus.BAD_REQUEST.value())
+        .message(e.getMessage()));
   }
 
   @Override
@@ -36,26 +39,30 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
       HttpHeaders headers,
       HttpStatusCode status,
       WebRequest request) {
-    var apiError = new ApiError((HttpStatus) status, "Validation failed");
+    MkApiErrorResponse apiError = buildApiError((HttpStatus) status, "Validation failed");
+
     e.getBindingResult().getAllErrors().stream()
         .map(this::buildApiValidationErrorFromObjectError)
-        .forEach(apiError::addSubError);
+        .forEach(apiError::addSubErrorsItem);
 
     return buildResponseEntity(apiError);
   }
 
-  private ApiValidationError buildApiValidationErrorFromObjectError(ObjectError error) {
-    String field =
-        error instanceof FieldError fieldError ? fieldError.getField() : error.getObjectName();
-    Object rejectedValue =
-        error instanceof FieldError fieldError ? fieldError.getRejectedValue() : null;
+  private MkApiValidationError buildApiValidationErrorFromObjectError(ObjectError error) {
+    String type = "ValidationError";
 
-    return new ApiValidationError(field, rejectedValue, error.getDefaultMessage());
-  }
+    if (error instanceof FieldError fieldError) {
+      return new MkApiValidationError()
+          .type(type)
+          .field(fieldError.getField())
+          .rejectedValue(fieldError.getRejectedValue())
+          .message(error.getDefaultMessage());
+    }
 
-  @ExceptionHandler(ParameterErrorException.class)
-  public ResponseEntity<Object> handleParameterErrorException(ParameterErrorException exception) {
-    return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage()));
+    return new MkApiValidationError()
+        .type(type)
+        .field(error.getObjectName())
+        .message(error.getDefaultMessage());
   }
 
   // https://stackoverflow.com/questions/36190246/handling-exception-in-spring-boot-rest-thrown-from-custom-converter
@@ -66,10 +73,25 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         .getCause()
         .getCause();
 
-    return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, cause.getMessage()));
+    return buildResponseEntity(buildApiError(HttpStatus.BAD_REQUEST, cause.getMessage()));
   }
 
-  private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
+  @ExceptionHandler(TrackDeserializationException.class)
+  public ResponseEntity<Object> handleTrackDeserializationException(
+      TrackDeserializationException ex) {
+
+    return buildResponseEntity(
+        buildApiError(HttpStatus.BAD_REQUEST, ex.getException().getMessage()));
+  }
+
+  private MkApiErrorResponse buildApiError(HttpStatus status, String message) {
+    return new MkApiErrorResponse()
+        .status(status.value())
+        .message(message)
+        .timestamp(LocalDateTime.now());
+  }
+
+  private ResponseEntity<Object> buildResponseEntity(MkApiErrorResponse apiError) {
     return ResponseEntity
         .status(apiError.getStatus())
         .body(apiError);

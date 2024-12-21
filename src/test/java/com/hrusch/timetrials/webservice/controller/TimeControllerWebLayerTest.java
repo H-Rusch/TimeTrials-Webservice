@@ -7,13 +7,16 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hrusch.openapi.model.MkApiErrorResponse;
+import com.hrusch.openapi.model.MkApiTimeResponse;
 import com.hrusch.timetrials.webservice.config.JacksonConfig;
-import com.hrusch.timetrials.webservice.controller.response.ApiError;
-import com.hrusch.timetrials.webservice.model.Time;
+import com.hrusch.timetrials.webservice.mapper.TimeMapper;
 import com.hrusch.timetrials.webservice.model.TimeDto;
 import com.hrusch.timetrials.webservice.model.Track;
 import com.hrusch.timetrials.webservice.service.TimeService;
+import com.hrusch.timetrials.webservice.testutils.MapperBeans;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -27,23 +30,26 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @WebMvcTest(controllers = TimeController.class)
-@Import(JacksonConfig.class)
+@Import({JacksonConfig.class, MapperBeans.class})
 class TimeControllerWebLayerTest {
 
   private static final String ENDPOINT = "/times";
 
-  @MockBean
+  @MockitoBean
   TimeService timeService;
+  @MockitoSpyBean
+  TimeMapper timeMapper;
 
   @Autowired
   private MockMvc mockMvc;
@@ -56,7 +62,7 @@ class TimeControllerWebLayerTest {
   }
 
   @Nested
-  class TimeControllerGetBestTimeForEachTrackWebLayerTest {
+  class TimeController_GetBestTimeForEachTrack_WebLayerTest {
 
     @Test
     void givenGetBestTimeForEachTrackRequestWithoutUsername_whenNoTimesInDatabase_thenReturn204HttpCode()
@@ -96,21 +102,21 @@ class TimeControllerWebLayerTest {
     void givenGetBestTimeForEachTrackRequestWithoutUsername_whenTimesInDatabase_returnList()
         throws Exception {
       // given
-      Time time = createSampleTime();
-      time.setUsername(null);
-      when(timeService.getBestTimeForEachTrack(time.getUsername()))
-          .thenReturn(List.of(time));
-      RequestBuilder requestBuilder = buildGetBestTimesRequest(time.getUsername());
+      TimeDto timeDto = createSampleTimeDto();
+      when(timeService.getBestTimeForEachTrack(null))
+          .thenReturn(List.of(timeDto));
+      RequestBuilder requestBuilder = buildGetBestTimesRequest(null);
 
       // when
       MvcResult mvcResult = mockMvc.perform(requestBuilder)
           .andExpect(status().isOk())
           .andReturn();
-      Time[] times = objectMapper.readValue(mvcResult.getResponse().getContentAsString(),
-          Time[].class);
+      MkApiTimeResponse[] timeResponses = objectMapper.readValue(
+          mvcResult.getResponse().getContentAsString(),
+          MkApiTimeResponse[].class);
 
       // then
-      assertThat(times)
+      assertThat(timeResponses)
           .hasSize(1);
     }
 
@@ -118,22 +124,25 @@ class TimeControllerWebLayerTest {
     void givenGetBestTimeForEachTrackRequestWithUsername_whenTimesInDatabase_returnList()
         throws Exception {
       // given
-      Time time = createSampleTime();
-      when(timeService.getBestTimeForEachTrack(anyString()))
-          .thenReturn(List.of(time));
-      RequestBuilder requestBuilder = buildGetBestTimesRequest(time.getUsername());
+      TimeDto timeDto = createSampleTimeDto();
+      timeDto.setCreatedAt(LocalDateTime.now());
+      when(timeService.getBestTimeForEachTrack(timeDto.getUsername()))
+          .thenReturn(List.of(timeDto));
+      RequestBuilder requestBuilder = buildGetBestTimesRequest(timeDto.getUsername());
 
       // when
       MvcResult mvcResult = mockMvc.perform(requestBuilder)
           .andExpect(status().isOk())
           .andReturn();
-      Time[] times = objectMapper.readValue(mvcResult.getResponse().getContentAsString(),
-          Time[].class);
+      MkApiTimeResponse[] timeResponses = objectMapper.readValue(
+          mvcResult.getResponse().getContentAsString(),
+          MkApiTimeResponse[].class);
 
       // then
-      assertThat(times)
+      assertThat(timeResponses)
           .hasSize(1)
-          .contains(time);
+          .extracting(MkApiTimeResponse::getUsername)
+          .containsExactly(timeDto.getUsername());
     }
 
     private static RequestBuilder buildGetBestTimesRequest(String username) {
@@ -148,7 +157,7 @@ class TimeControllerWebLayerTest {
   }
 
   @Nested
-  class TimeControllerGetBestTimeForTrackWebLayerTest {
+  class TimeController_GetBestTimeForTrack_WebLayerTest {
 
     @Test
     void givenGetBestTimeRequest_whenTrackNotGiven_thenReturn400HttpCode() throws Exception {
@@ -165,7 +174,7 @@ class TimeControllerWebLayerTest {
     }
 
     @Test
-    void givenGetBestTimeRequest_whenInvalidTrackGiven_then() throws Exception {
+    void givenGetBestTimeRequest_whenInvalidTrackGiven_thenReturn400HttpCode() throws Exception {
       // given
       RequestBuilder requestBuilder = buildGetBestTimeForTrackRequest("invalid", null);
 
@@ -199,22 +208,26 @@ class TimeControllerWebLayerTest {
     @Test
     void givenGetBestTimeRequest_whenTimesInDatabase_returnList() throws Exception {
       // given
-      Time time = createSampleTime();
-      when(timeService.getBestTimeForTrack(time.getTrack(), time.getUsername()))
-          .thenReturn(Optional.of(time));
+      TimeDto timeDto = createSampleTimeDtoWithTimestamp();
+      MkApiTimeResponse expectedResponse = timeMapper.map(timeDto);
+      when(timeService.getBestTimeForTrack(timeDto.getTrack(), timeDto.getUsername()))
+          .thenReturn(Optional.of(timeDto));
       RequestBuilder requestBuilder = buildGetBestTimeForTrackRequest(
-          time.getTrack(),
-          time.getUsername());
+          timeDto.getTrack(),
+          timeDto.getUsername());
 
       // when & then
       MvcResult mvcResult = mockMvc.perform(requestBuilder)
           .andExpect(status().isOk())
           .andReturn();
-      Time times = objectMapper.readValue(mvcResult.getResponse().getContentAsString(),
-          Time.class);
+      MkApiTimeResponse timeResponse = objectMapper.readValue(
+          mvcResult.getResponse().getContentAsString(),
+          MkApiTimeResponse.class);
 
-      assertThat(times)
-          .isEqualTo(time);
+      assertThat(timeResponse)
+          .usingRecursiveComparison()
+          .ignoringFields("createdAt")
+          .isEqualTo(expectedResponse);
     }
 
     private static RequestBuilder buildGetBestTimeForTrackRequest(Track track, String username) {
@@ -237,7 +250,7 @@ class TimeControllerWebLayerTest {
   }
 
   @Nested
-  class TimeControllerSaveNewTimeTest {
+  class TimeController_SaveNewTime_WebLayerTest {
 
     @Test
     void givenTimeDto_whenSavingToDatabase_then201Returned() throws Exception {
@@ -263,14 +276,15 @@ class TimeControllerWebLayerTest {
       MvcResult mvcResult = mockMvc.perform(requestBuilder)
           .andExpect(status().isBadRequest())
           .andReturn();
-      ApiError apiError = objectMapper
-          .readValue(mvcResult.getResponse().getContentAsString(), ApiError.class);
-      assertThat(apiError)
+      MkApiErrorResponse errorResponse = objectMapper.readValue(
+          mvcResult.getResponse().getContentAsString(),
+          MkApiErrorResponse.class);
+      assertThat(errorResponse)
           .extracting(
-              ApiError::getStatus,
-              ApiError::getMessage)
+              MkApiErrorResponse::getStatus,
+              MkApiErrorResponse::getMessage)
           .containsExactly(
-              HttpStatus.BAD_REQUEST,
+              HttpStatus.BAD_REQUEST.value(),
               "Validation failed");
     }
 
@@ -304,12 +318,11 @@ class TimeControllerWebLayerTest {
     }
   }
 
-  private Time createSampleTime() {
-    return Time.builder()
-        .username("username")
-        .track(Track.BABY_PARK_GCN)
-        .duration(Duration.parse("PT1M4.78S"))
-        .build();
+  private static TimeDto createSampleTimeDtoWithTimestamp() {
+    TimeDto timeDto = createSampleTimeDto();
+    timeDto.setCreatedAt(LocalDateTime.now());
+
+    return timeDto;
   }
 
   private static TimeDto createSampleTimeDto() {

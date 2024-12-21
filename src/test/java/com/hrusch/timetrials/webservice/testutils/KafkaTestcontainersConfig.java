@@ -10,9 +10,12 @@ import org.testcontainers.utility.DockerImageName;
 @TestConfiguration
 public class KafkaTestcontainersConfig {
 
+  private static final String TAG = "7.8.0";
+  private static final String KAFKA_IMAGE = "confluentinc/cp-kafka:%s".formatted(TAG);
+
   @Container
   private static final KafkaContainer kafkaContainer = new KafkaContainer(
-      DockerImageName.parse("confluentinc/cp-kafka:7.4.0"));
+      DockerImageName.parse(KAFKA_IMAGE));
 
   static {
     kafkaContainer.start();
