@@ -3,22 +3,21 @@ package com.hrusch.timetrials.webservice.repository;
 import com.hrusch.timetrials.webservice.model.Time;
 import com.hrusch.timetrials.webservice.model.Track;
 import com.hrusch.timetrials.webservice.util.CriteriaUtil;
+import java.time.Duration;
 import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.GroupOperation;
-import org.springframework.data.mongodb.core.aggregation.LimitOperation;
-import org.springframework.data.mongodb.core.aggregation.MatchOperation;
-import org.springframework.data.mongodb.core.aggregation.ReplaceRootOperation;
-import org.springframework.data.mongodb.core.aggregation.SortOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 @Slf4j
@@ -28,41 +27,46 @@ public class TimeRepositoryImpl implements TimeRepository {
 
   private static final String COLLECTION = "times";
 
-  private static final String USERNAME = "username";
   private static final String TRACK = "track";
+  private static final String DURATION = "duration";
+  private static final String USERNAME = "username";
 
-  private MongoTemplate mongoTemplate;
+  private final MongoTemplate mongoTemplate;
 
   @Override
-  public Collection<Time> findBestTimeForEachTrack(String username) {
-    Criteria criteria = CriteriaUtil.buildForValue(USERNAME, username)
+  public Collection<Collection<Time>> findBestTimeForEachTrack(String username) {
+    Criteria usernameCriteria = CriteriaUtil.buildForValue(USERNAME, username)
         .orElse(new Criteria());
 
-    return findBestTimeForEachTrackBasedOnCriteria(criteria);
+    return findBestTimeForEachTrackBasedOnCriteria(usernameCriteria)
+        .entrySet()
+        .stream()
+        .map(it -> buildTrackAndDurationCriteria(it.getKey(), it.getValue(), usernameCriteria))
+        .map(this::findTimesMatchingCriteria)
+        .toList();
   }
 
-  private List<Time> findBestTimeForEachTrackBasedOnCriteria(Criteria criteria) {
-    MatchOperation matchOperation = Aggregation.match(criteria);
-    SortOperation sortOperation = Aggregation.sort(Sort.by(Direction.ASC, "duration"));
-    GroupOperation groupOperation = Aggregation.group(TRACK)
-        .first("$$ROOT").as("document");
-    ReplaceRootOperation replaceRootOperation = Aggregation.replaceRoot("document");
-
+  private Map<Track, Duration> findBestTimeForEachTrackBasedOnCriteria(Criteria criteria) {
     Aggregation aggregation = Aggregation.newAggregation(
-        matchOperation,
-        sortOperation,
-        groupOperation,
-        replaceRootOperation);
+        Aggregation.match(criteria),
+        Aggregation.sort(Sort.by(Direction.ASC, DURATION)),
+        Aggregation.group(TRACK)
+            .first("$$ROOT").as("document"),
+        Aggregation.replaceRoot("document"));
 
     return mongoTemplate.aggregate(aggregation, COLLECTION, Time.class)
-        .getMappedResults();
+        .getMappedResults()
+        .stream()
+        .collect(Collectors.toMap(
+            Time::getTrack,
+            Time::getDuration));
   }
 
   @Override
-  public Optional<Time> findBestTimeForTrack(Track track, String username) {
+  public Collection<Time> findBestTimeForTrack(Track track, String username) {
     if (Objects.isNull(track)) {
       log.error("Track can not be null when searching best time for track.");
-      return Optional.empty();
+      return Collections.emptyList();
     }
 
     Criteria trackCriteria = Criteria.where(TRACK).is(track);
@@ -72,22 +76,47 @@ public class TimeRepositoryImpl implements TimeRepository {
         .map(it -> new Criteria().andOperator(trackCriteria, it))
         .orElse(trackCriteria);
 
-    return findBestTimeByCriteria(combinedCriteria);
+    return findBestTimesByCriteria(combinedCriteria);
   }
 
-  private Optional<Time> findBestTimeByCriteria(Criteria criteria) {
-    MatchOperation matchOperation = Aggregation.match(criteria);
-    SortOperation sortOperation = Aggregation.sort(Sort.by(Direction.ASC, "duration"));
-    LimitOperation limitOperation = Aggregation.limit(1);
+  private Collection<Time> findBestTimesByCriteria(Criteria trackAndUsernameCriteria) {
+    Optional<Duration> minimumDuration = findMinimumDurationMatchingCriteria(
+        trackAndUsernameCriteria);
+
+    if (minimumDuration.isEmpty()) {
+      log.error("minimum duration is empty");
+      return Collections.emptyList();
+    }
+
+    Criteria minimumDurationCriteria = Criteria.where(DURATION).is(minimumDuration.get());
+    Criteria combinedCriteria = minimumDurationCriteria.andOperator(trackAndUsernameCriteria);
+
+    return findTimesMatchingCriteria(combinedCriteria);
+  }
+
+  private Optional<Duration> findMinimumDurationMatchingCriteria(Criteria criteria) {
     Aggregation aggregation = Aggregation.newAggregation(
-        matchOperation,
-        sortOperation,
-        limitOperation);
+        Aggregation.match(criteria),
+        Aggregation.sort(Sort.by(Direction.ASC, DURATION)),
+        Aggregation.limit(1)
+    );
 
     return mongoTemplate.aggregate(aggregation, COLLECTION, Time.class)
         .getMappedResults()
         .stream()
-        .findFirst();
+        .findFirst()
+        .map(Time::getDuration);
+  }
+
+  private Collection<Time> findTimesMatchingCriteria(Criteria criteria) {
+    return mongoTemplate.find(Query.query(criteria), Time.class, COLLECTION);
+  }
+
+  private Criteria buildTrackAndDurationCriteria(Track track, Duration duration, Criteria usernameCriteria) {
+    return new Criteria().andOperator(
+        Criteria.where(TRACK).is(track),
+        Criteria.where(DURATION).is(duration),
+        usernameCriteria);
   }
 
   @Override

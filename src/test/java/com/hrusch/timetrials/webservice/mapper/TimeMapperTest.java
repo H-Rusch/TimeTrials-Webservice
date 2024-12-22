@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 
 import com.hrusch.openapi.model.MkApiCombination;
 import com.hrusch.openapi.model.MkApiTimeRequest;
-import com.hrusch.openapi.model.MkApiTimeResponse;
+import com.hrusch.openapi.model.MkApiTimeResponseEntry;
 import com.hrusch.timetrials.webservice.exception.DurationDeserializationException;
 import com.hrusch.timetrials.webservice.exception.EnumDeserializationException;
 import com.hrusch.timetrials.webservice.model.Time;
@@ -170,15 +170,15 @@ class TimeMapperTest {
     when(combinationMapper.map(any(Combination.class)))
         .thenReturn(mappedCombination);
 
-    MkApiTimeResponse result = mapper.map(timeDto);
+    MkApiTimeResponseEntry result = mapper.map(timeDto);
 
     assertThat(result)
         .extracting(
-            MkApiTimeResponse::getUsername,
-            MkApiTimeResponse::getTrack,
-            MkApiTimeResponse::getDuration,
-            MkApiTimeResponse::getCreatedAt,
-            MkApiTimeResponse::getCombination)
+            MkApiTimeResponseEntry::getUsername,
+            MkApiTimeResponseEntry::getTrack,
+            MkApiTimeResponseEntry::getDuration,
+            MkApiTimeResponseEntry::getCreatedAt,
+            MkApiTimeResponseEntry::getCombination)
         .containsExactly(
             USERNAME,
             TRACK.getName(),

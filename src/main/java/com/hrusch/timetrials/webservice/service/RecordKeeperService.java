@@ -45,8 +45,9 @@ public class RecordKeeperService {
     }
   }
 
-  private static Map<Track, Time> buildRecordForTrackMap(Collection<Time> records) {
+  private static Map<Track, Time> buildRecordForTrackMap(Collection<Collection<Time>> records) {
     return records.stream()
+        .flatMap(Collection::stream)
         .collect(Collectors.toMap(
             Time::getTrack,
             Function.identity()));

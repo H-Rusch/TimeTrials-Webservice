@@ -2,13 +2,15 @@ package com.hrusch.timetrials.webservice.controller;
 
 import com.hrusch.openapi.api.TimesApi;
 import com.hrusch.openapi.model.MkApiTimeRequest;
-import com.hrusch.openapi.model.MkApiTimeResponse;
+import com.hrusch.openapi.model.MkApiTimeResponseEntry;
 import com.hrusch.timetrials.webservice.mapper.TimeMapper;
 import com.hrusch.timetrials.webservice.model.TimeDto;
 import com.hrusch.timetrials.webservice.model.Track;
 import com.hrusch.timetrials.webservice.model.serialization.TrackStringToTrackConverter;
 import com.hrusch.timetrials.webservice.service.TimeService;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,27 +25,34 @@ public class TimeController implements TimesApi {
   private final TrackStringToTrackConverter trackConverter;
 
   @Override
-  public ResponseEntity<List<MkApiTimeResponse>> getBestTimeForEachTrack(String username) {
-    List<MkApiTimeResponse> times = timeService.getBestTimeForEachTrack(username).stream()
+  public ResponseEntity<Map<String, List<MkApiTimeResponseEntry>>> getBestTimeForEachTrack(
+      String username) {
+    var timesByTrack = timeService.getBestTimeForEachTrack(username)
+        .stream()
+        .flatMap(List::stream)
         .map(timeMapper::map)
-        .toList();
+        .collect(Collectors.groupingBy(MkApiTimeResponseEntry::getTrack));
 
-    if (times.isEmpty()) {
+    if (timesByTrack.isEmpty()) {
       return ResponseEntity.noContent().build();
     }
-    return ResponseEntity.ok(times);
+    return ResponseEntity.ok(timesByTrack);
   }
 
   @Override
-  public ResponseEntity<MkApiTimeResponse> getBestTimeForTrack(
+  public ResponseEntity<List<MkApiTimeResponseEntry>> getBestTimeForTrack(
       String trackIdentifier,
       String username) {
     Track track = trackConverter.convert(trackIdentifier);
 
-    return timeService.getBestTimeForTrack(track, username)
+    var timeResponseEntries = timeService.getBestTimeForTrack(track, username)
+        .stream()
         .map(timeMapper::map)
-        .map(ResponseEntity::ok)
-        .orElse(ResponseEntity.noContent().build());
+        .toList();
+
+    return timeResponseEntries.isEmpty()
+        ? ResponseEntity.noContent().build()
+        : ResponseEntity.ok(timeResponseEntries);
   }
 
   @Override

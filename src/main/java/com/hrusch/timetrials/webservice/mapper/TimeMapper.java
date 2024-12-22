@@ -3,7 +3,7 @@ package com.hrusch.timetrials.webservice.mapper;
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 
 import com.hrusch.openapi.model.MkApiTimeRequest;
-import com.hrusch.openapi.model.MkApiTimeResponse;
+import com.hrusch.openapi.model.MkApiTimeResponseEntry;
 import com.hrusch.timetrials.webservice.model.Time;
 import com.hrusch.timetrials.webservice.model.TimeDto;
 import com.hrusch.timetrials.webservice.model.Track;
@@ -37,7 +37,7 @@ public interface TimeMapper {
   @Mapping(source = "combination", target = "combination",
       nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
   @Mapping(source = "createdAt", target = "createdAt")
-  MkApiTimeResponse map(TimeDto timeDto);
+  MkApiTimeResponseEntry map(TimeDto timeDto);
 
   @Mapping(source = "timeDto.username", target = "username")
   @Mapping(source = "timeDto.track", target = "track")

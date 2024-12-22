@@ -3,7 +3,10 @@ package com.hrusch.timetrials.cucumber;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hrusch.openapi.model.MkApiTimeResponseEntry;
+import com.hrusch.timetrials.cucumber.DataTableMappings.TrackTimeEntry;
 import com.hrusch.timetrials.webservice.model.Time;
 import com.hrusch.timetrials.webservice.model.TimeDto;
 import com.hrusch.timetrials.webservice.testutils.TestDataReader;
@@ -19,6 +22,8 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -59,6 +64,8 @@ public class StepDefinitions {
     request = RestAssured.given()
         .port(port)
         .basePath(BASE_PATH);
+
+    mongoTemplate.dropCollection(COLLECTION);
   }
 
   // Given
@@ -132,21 +139,30 @@ public class StepDefinitions {
 
   @Then("response contains the following times")
   public void responseContainsTimes(List<String> timeFiles) {
-    List<Time> expectedTimes = timeFiles.stream()
+    var expectedTimes = timeFiles.stream()
         .map(testDataReader::readFileToString)
-        .map(this::convertToTime)
+        .map(this::convertToTimeResponseEntity)
         .toList();
 
-    assertThat(response.body().jsonPath().getList("", Time.class))
+    assertThat(response.body().jsonPath().getList("", MkApiTimeResponseEntry.class))
         .containsExactlyInAnyOrderElementsOf(expectedTimes);
   }
 
-  @Then("response is the time {word}")
-  public void responseContainsTimes(String timeFile) {
-    Time expectedTime = convertToTime(testDataReader.readFileToString(timeFile));
+  @SneakyThrows
+  @Then("response contains the following times for tracks")
+  public void responseContainsTimesForTracks(List<TrackTimeEntry> trackTimeEntries) {
+    Map<String, List<MkApiTimeResponseEntry>> trackTimesMap = trackTimeEntries
+        .stream()
+        .map(it -> convertToTimeResponseEntity(testDataReader.readFileToString(it.file())))
+        .collect(Collectors.groupingBy(MkApiTimeResponseEntry::getTrack));
 
-    assertThat(response.body().jsonPath().getObject("", Time.class))
-        .isEqualTo(expectedTime);
+    String responseBody = response.body().asString();
+    Map<String, List<MkApiTimeResponseEntry>> trackTimeResponse = objectMapper.readValue(
+        responseBody, new TypeReference<>() {
+        });
+
+    assertThat(trackTimeResponse)
+        .isEqualTo(trackTimesMap);
   }
 
   @Then("database contains time {word}")
@@ -162,7 +178,7 @@ public class StepDefinitions {
     List<Time> result = mongoTemplate.find(query, Time.class, COLLECTION);
 
     assertThat(result).hasSize(1);
-    assertThat(result.get(0))
+    assertThat(result.getFirst())
         .extracting(
             Time::getUsername,
             Time::getTrack,
@@ -178,6 +194,11 @@ public class StepDefinitions {
   @SneakyThrows
   private Time convertToTime(String jsonString) {
     return objectMapper.readValue(jsonString, Time.class);
+  }
+
+  @SneakyThrows
+  private MkApiTimeResponseEntry convertToTimeResponseEntity(String jsonString) {
+    return objectMapper.readValue(jsonString, MkApiTimeResponseEntry.class);
   }
 
   @SneakyThrows

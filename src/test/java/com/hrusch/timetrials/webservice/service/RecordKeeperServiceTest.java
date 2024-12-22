@@ -10,6 +10,7 @@ import com.hrusch.timetrials.webservice.model.Track;
 import com.hrusch.timetrials.webservice.repository.TimeRepository;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -51,7 +52,7 @@ class RecordKeeperServiceTest {
   void givenTime_whenUpdatingAndNewDurationCausesUpdate_thenVerifyInteraction(Duration duration) {
     // given
     when(timeRepository.findBestTimeForEachTrack(null))
-        .thenReturn(Set.of(createValidTime(DURATION)));
+        .thenReturn(Set.of(List.of(createValidTime(DURATION))));
     subject = new RecordKeeperService(timeRepository, publishNewRecordKafkaProducerService);
     Time time = createValidTime(duration);
 
@@ -73,7 +74,7 @@ class RecordKeeperServiceTest {
   void givenTime_whenUpdatingAndTimeWorseThanExisting_thenVerifyNoInteraction() {
     // given
     when(timeRepository.findBestTimeForEachTrack(null))
-        .thenReturn(Set.of(createValidTime(DURATION)));
+        .thenReturn(Set.of(List.of(createValidTime(DURATION))));
     subject = new RecordKeeperService(timeRepository, publishNewRecordKafkaProducerService);
     Time time = createValidTime(DURATION.plus(Duration.ofMillis(1)));
 

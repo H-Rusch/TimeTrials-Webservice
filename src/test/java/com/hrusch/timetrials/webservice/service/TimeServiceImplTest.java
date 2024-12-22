@@ -13,7 +13,7 @@ import com.hrusch.timetrials.webservice.model.Track;
 import com.hrusch.timetrials.webservice.repository.TimeRepository;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.Collection;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -81,7 +81,7 @@ class TimeServiceImplTest {
     @MethodSource("usernameParameterVariations")
     void givenNullAsTrack_whenGetBestTimeForTrack_thenReturnEmptyOptional(String username) {
       // given & when
-      Optional<TimeDto> result = subject.getBestTimeForTrack(null, username);
+      Collection<TimeDto> result = subject.getBestTimeForTrack(null, username);
 
       // then
       assertThat(result).isEmpty();
