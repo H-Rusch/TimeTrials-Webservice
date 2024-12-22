@@ -1,14 +1,16 @@
 package com.hrusch.timetrials.webservice.controller;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static com.hrusch.timetrials.webservice.model.Track.BABY_PARK_GCN;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hrusch.openapi.model.MkApiErrorResponse;
-import com.hrusch.openapi.model.MkApiTimeResponse;
+import com.hrusch.openapi.model.MkApiTimeResponseEntry;
 import com.hrusch.timetrials.webservice.config.JacksonConfig;
 import com.hrusch.timetrials.webservice.mapper.TimeMapper;
 import com.hrusch.timetrials.webservice.model.TimeDto;
@@ -19,10 +21,12 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.SneakyThrows;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -99,50 +103,83 @@ class TimeControllerWebLayerTest {
     }
 
     @Test
-    void givenGetBestTimeForEachTrackRequestWithoutUsername_whenTimesInDatabase_returnList()
+    void givenGetBestTimeForEachTrackRequestWithoutUsername_whenTimesInDatabase_returnMap()
         throws Exception {
       // given
       TimeDto timeDto = createSampleTimeDto();
       when(timeService.getBestTimeForEachTrack(null))
-          .thenReturn(List.of(timeDto));
+          .thenReturn(List.of(List.of(timeDto)));
       RequestBuilder requestBuilder = buildGetBestTimesRequest(null);
 
       // when
       MvcResult mvcResult = mockMvc.perform(requestBuilder)
           .andExpect(status().isOk())
           .andReturn();
-      MkApiTimeResponse[] timeResponses = objectMapper.readValue(
+      Map<String, List<MkApiTimeResponseEntry>> timeResponses = objectMapper.readValue(
           mvcResult.getResponse().getContentAsString(),
-          MkApiTimeResponse[].class);
+          Map.class);
 
       // then
       assertThat(timeResponses)
-          .hasSize(1);
+          .asInstanceOf(InstanceOfAssertFactories.MAP)
+          .containsOnlyKeys(BABY_PARK_GCN.getName());
     }
 
     @Test
-    void givenGetBestTimeForEachTrackRequestWithUsername_whenTimesInDatabase_returnList()
+    void givenGetBestTimeForEachTrackRequestWithUsername_whenTimesInDatabase_returnMap()
         throws Exception {
       // given
       TimeDto timeDto = createSampleTimeDto();
       timeDto.setCreatedAt(LocalDateTime.now());
       when(timeService.getBestTimeForEachTrack(timeDto.getUsername()))
-          .thenReturn(List.of(timeDto));
+          .thenReturn(List.of(List.of(timeDto)));
       RequestBuilder requestBuilder = buildGetBestTimesRequest(timeDto.getUsername());
 
       // when
       MvcResult mvcResult = mockMvc.perform(requestBuilder)
           .andExpect(status().isOk())
           .andReturn();
-      MkApiTimeResponse[] timeResponses = objectMapper.readValue(
+      Map<String, List<MkApiTimeResponseEntry>> timeResponses = objectMapper.readValue(
           mvcResult.getResponse().getContentAsString(),
-          MkApiTimeResponse[].class);
+          new TypeReference<>() {
+          });
 
       // then
       assertThat(timeResponses)
-          .hasSize(1)
-          .extracting(MkApiTimeResponse::getUsername)
-          .containsExactly(timeDto.getUsername());
+          .containsOnlyKeys(BABY_PARK_GCN.getName())
+          .extractingByKey(BABY_PARK_GCN.getName(), InstanceOfAssertFactories.LIST)
+          .hasSize(1);
+      assertThat(timeResponses.get(BABY_PARK_GCN.getName()).getFirst())
+          .extracting(MkApiTimeResponseEntry::getUsername)
+          .isEqualTo(timeDto.getUsername());
+    }
+
+    @Test
+    void givenGetBestTimeForEachTrackRequestWithoutUsername_whenMultipleTimesInDatabaseWithSameDuration_thenReturnedMapContainsBothEntries()
+        throws Exception {
+      // given
+      TimeDto timeDto1 = createSampleTimeDto();
+      timeDto1.setCreatedAt(LocalDateTime.now());
+      TimeDto timeDto2 = createSampleTimeDto();
+      timeDto2.setCreatedAt(LocalDateTime.now());
+      when(timeService.getBestTimeForEachTrack(null))
+          .thenReturn(List.of(List.of(timeDto1, timeDto2)));
+      RequestBuilder requestBuilder = buildGetBestTimesRequest(null);
+
+      // when
+      MvcResult mvcResult = mockMvc.perform(requestBuilder)
+          .andExpect(status().isOk())
+          .andReturn();
+      Map<String, List<MkApiTimeResponseEntry>> timeResponses = objectMapper.readValue(
+          mvcResult.getResponse().getContentAsString(),
+          new TypeReference<>() {
+          });
+
+      // then
+      assertThat(timeResponses)
+          .containsOnlyKeys(BABY_PARK_GCN.getName())
+          .extractingByKey(BABY_PARK_GCN.getName(), InstanceOfAssertFactories.LIST)
+          .hasSize(2);
     }
 
     private static RequestBuilder buildGetBestTimesRequest(String username) {
@@ -191,9 +228,9 @@ class TimeControllerWebLayerTest {
     void givenGetBestTimeRequest_whenNoTimeInDatabase_return204HttpCode() throws Exception {
       // given
       when(timeService.getBestTimeForTrack(any(Track.class), anyString()))
-          .thenReturn(Optional.empty());
+          .thenReturn(List.of());
       RequestBuilder requestBuilder = buildGetBestTimeForTrackRequest(
-          Track.BABY_PARK_GCN,
+          BABY_PARK_GCN,
           "username");
 
       // when & then
@@ -209,9 +246,9 @@ class TimeControllerWebLayerTest {
     void givenGetBestTimeRequest_whenTimesInDatabase_returnList() throws Exception {
       // given
       TimeDto timeDto = createSampleTimeDtoWithTimestamp();
-      MkApiTimeResponse expectedResponse = timeMapper.map(timeDto);
+      MkApiTimeResponseEntry expectedResponse = timeMapper.map(timeDto);
       when(timeService.getBestTimeForTrack(timeDto.getTrack(), timeDto.getUsername()))
-          .thenReturn(Optional.of(timeDto));
+          .thenReturn(List.of(timeDto));
       RequestBuilder requestBuilder = buildGetBestTimeForTrackRequest(
           timeDto.getTrack(),
           timeDto.getUsername());
@@ -220,14 +257,42 @@ class TimeControllerWebLayerTest {
       MvcResult mvcResult = mockMvc.perform(requestBuilder)
           .andExpect(status().isOk())
           .andReturn();
-      MkApiTimeResponse timeResponse = objectMapper.readValue(
+      List<MkApiTimeResponseEntry> timeResponse = objectMapper.readValue(
           mvcResult.getResponse().getContentAsString(),
-          MkApiTimeResponse.class);
+          new TypeReference<>() {
+          });
 
       assertThat(timeResponse)
+          .hasSize(1)
+          .first()
           .usingRecursiveComparison()
           .ignoringFields("createdAt")
           .isEqualTo(expectedResponse);
+    }
+
+    @Test
+    void givenGetBestTimeRequestWithoutUsername_whenTyingTimesInDatabase_thenReturnedListContainsMoreThanOneValue()
+        throws Exception {
+      // given
+      TimeDto timeDto1 = createSampleTimeDtoWithTimestamp();
+      TimeDto timeDto2 = createSampleTimeDtoWithTimestamp();
+      when(timeService.getBestTimeForTrack(timeDto1.getTrack(), timeDto1.getUsername()))
+          .thenReturn(List.of(timeDto1, timeDto2));
+      RequestBuilder requestBuilder = buildGetBestTimeForTrackRequest(
+          timeDto1.getTrack(),
+          timeDto1.getUsername());
+
+      // when & then
+      MvcResult mvcResult = mockMvc.perform(requestBuilder)
+          .andExpect(status().isOk())
+          .andReturn();
+      List<MkApiTimeResponseEntry> timeResponse = objectMapper.readValue(
+          mvcResult.getResponse().getContentAsString(),
+          new TypeReference<>() {
+          });
+
+      assertThat(timeResponse)
+          .hasSize(2);
     }
 
     private static RequestBuilder buildGetBestTimeForTrackRequest(Track track, String username) {
@@ -328,7 +393,7 @@ class TimeControllerWebLayerTest {
   private static TimeDto createSampleTimeDto() {
     return TimeDto.builder()
         .username("username")
-        .track(Track.BABY_PARK_GCN)
+        .track(BABY_PARK_GCN)
         .duration(Duration.parse("PT1M4.78S"))
         .build();
   }

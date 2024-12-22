@@ -1,6 +1,8 @@
 package com.hrusch.timetrials.webservice.repository;
 
 
+import static com.hrusch.timetrials.webservice.model.Track.BABY_PARK_GCN;
+import static com.hrusch.timetrials.webservice.model.Track.MARIO_CIRCUIT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.hrusch.timetrials.webservice.config.JacksonConfig;
@@ -12,9 +14,8 @@ import com.hrusch.timetrials.webservice.testutils.TestDataReader;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Optional;
+import java.util.List;
 import lombok.SneakyThrows;
-import org.assertj.core.api.Assertions;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -68,32 +69,33 @@ class TimeRepositoryImplIT {
   class TimeRepositoryImplFindBestTimeForTrackTest {
 
     @Test
-    void givenNoParameter_whenFindBestTime_thenReturnEmptyOptional() {
+    void givenNoParameter_whenFindBestTime_thenReturnEmptyList() {
       // given, when & then
-      Assertions.assertThat(subject.findBestTimeForTrack(null, null))
+      assertThat(subject.findBestTimeForTrack(null, null))
           .isEmpty();
     }
 
     @Test
-    void givenOnlyUsername_whenFindBestTime_thenReturnEmptyOptional() {
+    void givenOnlyUsername_whenFindBestTime_thenReturnEmptyList() {
       // given, when & then
-      Assertions.assertThat(subject.findBestTimeForTrack(null, "name1"))
+      assertThat(subject.findBestTimeForTrack(null, "name1"))
           .isEmpty();
     }
 
     @Test
-    void givenOnlyTrack_whenFindBestTime_thenReturnBestTimeForTrack() {
+    void givenOnlyTrack_whenFindBestTime_thenReturnBestTimesForTrack() {
       // given
-      Track track = Track.BABY_PARK_GCN;
+      Track track = BABY_PARK_GCN;
       String expectedUsername = "name2";
       Duration expectedDuration = Duration.parse("PT1M1.48S");
 
       // given
-      Optional<Time> result = subject.findBestTimeForTrack(track, null);
+      Collection<Time> result = subject.findBestTimeForTrack(track, null);
 
       // then
-      assertThat(result).isPresent();
-      assertThat(result.get())
+      assertThat(result)
+          .hasSize(1)
+          .first()
           .extracting(
               Time::getUsername,
               Time::getTrack,
@@ -105,18 +107,38 @@ class TimeRepositoryImplIT {
     }
 
     @Test
-    void givenTrackAndUsername_whenFindBestTime_thenReturnBestTimeForUserOnTrack() {
+    void givenTrackForTrackHavingWrTie_whenFindBestTime_thenReturnBestTimesForTrack() {
       // given
-      String username = "name1";
-      Track track = Track.BABY_PARK_GCN;
-      Duration expectedDuration = Duration.parse("PT1M7.48S");
+      Track track = MARIO_CIRCUIT;
+      List<String> expectedUsernames = List.of("name1", "name3");
+      Duration expectedDuration = Duration.parse("PT1M34.123S");
 
-      // when
-      Optional<Time> result = subject.findBestTimeForTrack(track, username);
+      // given
+      Collection<Time> result = subject.findBestTimeForTrack(track, null);
 
       // then
-      assertThat(result).isPresent();
-      assertThat(result.get())
+      assertThat(result)
+          .hasSize(2)
+          .allMatch(
+              time -> time.getTrack().equals(track) && time.getDuration().equals(expectedDuration))
+          .extracting(Time::getUsername)
+          .containsExactlyInAnyOrderElementsOf(expectedUsernames);
+    }
+
+    @Test
+    void givenTrackAndUsername_whenFindBestTime_thenReturnBestTimeForUserOnTrackEvenIfThereWasATrie() {
+      // given
+      String username = "name1";
+      Track track = MARIO_CIRCUIT;
+      Duration expectedDuration = Duration.parse("PT1M34.123S");
+
+      // when
+      Collection<Time> result = subject.findBestTimeForTrack(track, username);
+
+      // then
+      assertThat(result)
+          .hasSize(1)
+          .first()
           .extracting(
               Time::getUsername,
               Time::getTrack,
@@ -134,17 +156,25 @@ class TimeRepositoryImplIT {
     @Test
     void givenNoParameters_whenFindBestTimeForEachTrack_thenReturnedListContainsOnlyTheBestTimes() {
       // given & when
-      Collection<Time> result = subject.findBestTimeForEachTrack(null);
+      Collection<Collection<Time>> result = subject.findBestTimeForEachTrack(null);
+      System.out.println(result);
 
       // then
       assertThat(result)
+          .hasSize(2);
+      List<Time> flattenedRecords = result.stream()
+          .flatMap(Collection::stream)
+          .toList();
+      assertThat(flattenedRecords)
+          .hasSize(3)
           .extracting(
               Time::getUsername,
               Time::getTrack,
               Time::getDuration)
           .containsExactlyInAnyOrder(
-              Tuple.tuple("name2", Track.BABY_PARK_GCN, Duration.parse("PT1M1.48S")),
-              Tuple.tuple("name1", Track.MARIO_CIRCUIT, Duration.parse("PT1M34.123S")));
+              Tuple.tuple("name2", BABY_PARK_GCN, Duration.parse("PT1M1.48S")),
+              Tuple.tuple("name1", MARIO_CIRCUIT, Duration.parse("PT1M34.123S")),
+              Tuple.tuple("name3", MARIO_CIRCUIT, Duration.parse("PT1M34.123S")));
     }
 
     @Test
@@ -153,20 +183,22 @@ class TimeRepositoryImplIT {
       String username = "name1";
 
       // when
-      Collection<Time> result = subject.findBestTimeForEachTrack(username);
-      System.out.println(result);
+      Collection<Collection<Time>> result = subject.findBestTimeForEachTrack(username);
 
       // then
       assertThat(result)
           .hasSize(2)
-          .allMatch(time -> time.getUsername().equals(username));
-      assertThat(result)
+          .allMatch(times -> times.size() == 1);
+      List<Time> flattenedTimes = result.stream()
+          .flatMap(Collection::stream)
+          .toList();
+      assertThat(flattenedTimes)
           .extracting(
               Time::getUsername,
               Time::getTrack,
               Time::getDuration)
           .containsExactlyInAnyOrder(
-              Tuple.tuple(username, Track.BABY_PARK_GCN, Duration.parse("PT1M7.48S")),
+              Tuple.tuple(username, BABY_PARK_GCN, Duration.parse("PT1M7.48S")),
               Tuple.tuple(username, Track.MARIO_CIRCUIT, Duration.parse("PT1M34.123S")));
     }
   }
@@ -215,7 +247,7 @@ class TimeRepositoryImplIT {
       return Time.builder()
           .username("username")
           .duration(Duration.parse("PT1M7.48S"))
-          .track(Track.BABY_PARK_GCN)
+          .track(BABY_PARK_GCN)
           .createdAt(LocalDateTime.now())
           .build();
     }

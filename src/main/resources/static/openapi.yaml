@@ -67,18 +67,22 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TimeResponse'
+                $ref: '#/components/schemas/RecordForEachTrackResponse'
               example:
-                - username: 'Username'
-                  track: 'GCN Baby Park'
-                  duration: '1:05.480'
-                  createdAt: '2023-11-20 15:28:15'
-                - username: 'Other Username'
-                  track: 'Water Park'
-                  duration: '1:24.534'
-                  createdAt: '2023-11-20 12:03:26'
+                BabyPark:
+                  - username: 'Username'
+                    track: 'GCN Baby Park'
+                    duration: '1:05.480'
+                    createdAt: '2023-11-20 15:28:15'
+                  - username: 'Username2'
+                    track: 'GCN Baby Park'
+                    duration: '1:05.480'
+                    createdAt: '2023-11-20 03:54:11'
+                WaterPark:
+                  - username: 'Other Username'
+                    track: 'Water Park'
+                    duration: '1:24.534'
+                    createdAt: '2023-11-20 12:03:26'
         '204':
           description: NO_CONTENT an empty response signalling no times were found.
 
@@ -134,7 +138,7 @@ components:
       description: Response sent to the user when there was an error performing an API request
       properties:
         status:
-          type: int
+          type: integer
           description: HTTP status code showing what went wrong
         message:
           type: string
@@ -194,9 +198,20 @@ components:
           type: object
           $ref: '#/components/schemas/Combination'
 
-    TimeResponse:
+    RecordForEachTrackResponse:
       type: object
-      description: Response entity returned to the user
+      additionalProperties:
+        $ref: '#/components/schemas/TimeResponse'
+
+    TimeResponse:
+      description: Response entity returned to the user. Includes multiple times in case multiple times are tied
+      type: array
+      items:
+        $ref: '#/components/schemas/TimeResponseEntry'
+
+    TimeResponseEntry:
+      type: object
+      description: Time entry a user has driven on a track with additional information
       properties:
         username:
           type: string
@@ -215,6 +230,7 @@ components:
           type: string
           format: date-time
           description: Timestamp when the time was created in the format 'yyyy-MM-dd HH:mm:ss'
+
 
     Combination:
       type: object
