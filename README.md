@@ -1,12 +1,10 @@
 # Time Trials Webservice
 
-This application is a Spring Boot based webservice that provides a REST API to save and query times
-driven in Mario Kart 8 Deluxe Time Trials.
+Spring Boot based webservice to store and query times driven in Mario Kart 8 Deluxe Time Trials.
 
-Additionally, this service uses Kafka to consume new times and to publish new records when the
-record for a track is broken.
-
-MongoDB is used to store the data.
+This service provides a REST API to store or query times. Additionally, it uses Kafka to consume
+new times and to publish new records when the record for a track is broken. MongoDB is used to store
+the data.
 
 ## Build
 
